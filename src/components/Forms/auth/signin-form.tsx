@@ -42,6 +42,9 @@ const SignInForm: React.FC = () => {
                 // Save access token as a cookie
                 Cookies.set('auth_token', token, { expires: 7 });
 
+                // Save user data in localStorage
+                localStorage.setItem('user_data', JSON.stringify(user));
+
                 // Redirect to the home page after successful login
                 router.push('/');
             } else {

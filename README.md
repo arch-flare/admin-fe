@@ -1,20 +1,20 @@
-# TailAdmin Next.js - Free Next.js Tailwind Admin Dashboard Template
+# Archflaire Next.js - Free Next.js Tailwind Admin Dashboard Template
 
-TailAdmin is a free and open-source admin dashboard template built on **Next.js and Tailwind CSS** providing developers with everything they need to create a feature-rich and data-driven: back-end, dashboard, or admin panel solution for any sort of web project.
+Archflaire is a free and open-source admin dashboard template built on **Next.js and Tailwind CSS** providing developers with everything they need to create a feature-rich and data-driven: back-end, dashboard, or admin panel solution for any sort of web project.
 
-[![tailwind nextjs admin template](https://github.com/TailAdmin/free-nextjs-admin-dashboard/blob/main/tailadmin-nextjs.jpg)](https://nextjs-demo.tailadmin.com/)
+[![tailwind nextjs admin template](https://github.com/Archflaire/free-nextjs-admin-dashboard/blob/main/Archflaire-nextjs.jpg)](https://nextjs-demo.Archflaire.com/)
 
-With TailAdmin Next.js, you get access to all the necessary dashboard UI components, elements, and pages required to build a high-quality and complete dashboard or admin panel. Whether you're building a dashboard or admin panel for a complex web application or a simple website. 
+With Archflaire Next.js, you get access to all the necessary dashboard UI components, elements, and pages required to build a high-quality and complete dashboard or admin panel. Whether you're building a dashboard or admin panel for a complex web application or a simple website. 
 
-TailAdmin utilizes the powerful features of **Next.js 14** and common features of Next.js such as server-side rendering (SSR), static site generation (SSG), and seamless API route integration. Combined with the advancements of **React 18** and the robustness of **TypeScript**, TailAdmin is the perfect solution to help get your project up and running quickly.
+Archflaire utilizes the powerful features of **Next.js 14** and common features of Next.js such as server-side rendering (SSR), static site generation (SSG), and seamless API route integration. Combined with the advancements of **React 18** and the robustness of **TypeScript**, Archflaire is the perfect solution to help get your project up and running quickly.
 
-### [✨ Visit Website](https://tailadmin.com/)
-### [🚀 PRO Demo](https://nextjs-demo.tailadmin.com/)
-### [🚀 FREE Demo](https://nextjs-free-demo.tailadmin.com/)
+### [✨ Visit Website](https://Archflaire.com/)
+### [🚀 PRO Demo](https://nextjs-demo.Archflaire.com/)
+### [🚀 FREE Demo](https://nextjs-free-demo.Archflaire.com/)
 
-### TailAdmin Next.js PRO vs TailAdmin Next.js FREE Comparison 📊
+### Archflaire Next.js PRO vs Archflaire Next.js FREE Comparison 📊
 
-#### [TailAdmin Next.js PRO](https://nextjs-demo.tailadmin.com/)
+#### [Archflaire Next.js PRO](https://nextjs-demo.Archflaire.com/)
 - 5 Unique Dashboards: Analytics, Ecommerce, Marketing, and CRM (More will be added)
 - 150+ Dashboard UI Components
 - 200+ Total UI Elements
@@ -23,7 +23,7 @@ TailAdmin utilizes the powerful features of **Next.js 14** and common features o
 - Full Figma Design Source - As Shown on Demo
 ___
 
-#### [TailAdmin Next.js FREE](https://free-nextjs-demo.tailadmin.com/)
+#### [Archflaire Next.js FREE](https://free-nextjs-demo.Archflaire.com/)
 - 1 Unique Dashboard
 - 30+ Dashboard UI Components
 - 50+ Total UI Elements 
@@ -33,15 +33,15 @@ ___
 - Figma Design Source - Free Sample
 ___
 
-### [⬇️ Download Now](https://tailadmin.com/download)
+### [⬇️ Download Now](https://Archflaire.com/download)
 
-### [⚡ Get PRO Version](https://tailadmin.com/pricing)
+### [⚡ Get PRO Version](https://Archflaire.com/pricing)
 
-### [📄 Documentation/Installation](https://tailadmin.com/docs)
+### [📄 Documentation/Installation](https://Archflaire.com/docs)
 
-### [🖌️ TailAdmin Figma Free Sample](https://www.figma.com/community/file/1214477970819985778)
+### [🖌️ Archflaire Figma Free Sample](https://www.figma.com/community/file/1214477970819985778)
 
-### [👉 TailAdmin HTML Version](https://github.com/TailAdmin/tailadmin-free-tailwind-dashboard-template)
+### [👉 Archflaire HTML Version](https://github.com/Archflaire/Archflaire-free-tailwind-dashboard-template)
 
 
 ## Installation
@@ -74,14 +74,14 @@ yarn dev
 
 
 ## Free Admin Dashboard Template for Next.js Built-with Tailwind CSS, React 18 and TypeScript
-TailAdmin Next.js is a free dashboard template, which uses Tailwind CSS, is a great starting point for dashboard UI. This template uses the Next.js JavaScript framework and the easy-to-use Tailwind CSS framework. The Tailwind CSS and Next.js Dashboard Template comes with ready-made components like navigation menus, charts, tables, and forms. These components can be easily adjusted and added to any Next.js web application.
+Archflaire Next.js is a free dashboard template, which uses Tailwind CSS, is a great starting point for dashboard UI. This template uses the Next.js JavaScript framework and the easy-to-use Tailwind CSS framework. The Tailwind CSS and Next.js Dashboard Template comes with ready-made components like navigation menus, charts, tables, and forms. These components can be easily adjusted and added to any Next.js web application.
 
-TailAdmin for Next.js provides all essential Next.js + Tailwind CSS UI components that can be copied and pasted directly into your dashboard projects. The range of components includes charts, graphs, navbars, tabs, buttons, cards, tables, profiles, forms, modals, app pages, calendars, web app example templates, and more, all coded for Next.js React and styled using Tailwind CSS.
+Archflaire for Next.js provides all essential Next.js + Tailwind CSS UI components that can be copied and pasted directly into your dashboard projects. The range of components includes charts, graphs, navbars, tabs, buttons, cards, tables, profiles, forms, modals, app pages, calendars, web app example templates, and more, all coded for Next.js React and styled using Tailwind CSS.
 
-If you're on the hunt for a top-quality Next.js-Tailwind Dashboard, Admin Panel Template, or UI Kit, TailAdmin is the perfect choice for you!
+If you're on the hunt for a top-quality Next.js-Tailwind Dashboard, Admin Panel Template, or UI Kit, Archflaire is the perfect choice for you!
 
 ### 📄 License
-TailAdmin Next.js Free is 100% free and open-source; feel free to use it with your personal and commercial projects.
+Archflaire Next.js Free is 100% free and open-source; feel free to use it with your personal and commercial projects.
 
 ### 💜 Support
 If you like the template, please star this repository to inspire the team to create more stuff like this and reach more users like you!
@@ -131,4 +131,4 @@ If you like the template, please star this repository to inspire the team to cre
 
 ### Version 0.1.0 - Initial Release - [Aug 3, 2023]
 
-- Initial release of TailAdmin Next.
+- Initial release of Archflaire Next.
