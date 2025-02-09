@@ -2,18 +2,22 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
-import SignInForm from "@/components/Forms/auth/signin-form";
+import ForgotPasswordForm from "@/components/Forms/auth/forgot-password-form";
+import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('ForgotPassword');
   return {
-    title: "Archflaire-Login",
-    description: "Archflaire login",
+    title: t('metadata.title'),
+    description: t('metadata.description'),
   };
 }
 
-const SignIn: React.FC = () => {
+const ForgotPassword: React.FC = () => {
+  const t = useTranslations('ForgotPassword');
 
   return (
     <div className="flex flex-wrap items-center">
@@ -23,35 +27,35 @@ const SignIn: React.FC = () => {
           <Link
             className="mb-5.5 inline-block"
             href="/"
-            aria-label="Dashboard"
+            aria-label={t('accessibility.homeLink')}
           >
-            {/* <Image
+            <Image
               className="hidden dark:block"
               src={"/logos/logo.png"}
-              alt="Logo"
+              alt={t('accessibility.logo')}
               width={176}
               height={32}
             />
             <Image
               className="dark:hidden"
               src={"/logos/logo.png"}
-              alt="Logo"
+              alt={t('accessibility.logo')}
               width={176}
               height={32}
-            /> */}
+            />
           </Link>
 
           <p className="2xl:px-20">
-            Archflaire admin dashboard
+            {t('tagline')}
           </p>
         </div>
       </div>
 
       <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
-        <SignInForm />
+        <ForgotPasswordForm />
       </div>
     </div>
   );
 };
 
-export default SignIn;
+export default ForgotPassword;
