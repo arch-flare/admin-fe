@@ -6,9 +6,9 @@ import AddShopCategory from "@/components/Forms/shop/categories/AddCategory";
 import EditShopCategory from "@/components/Forms/shop/categories/EditCategory";
 
 export const metadata: Metadata = {
-    title: "Archflaire Add Shop Categories",
+    title: "Archflaire Edit Shop Categories",
     description:
-        "Archflaire Add Shop Categories",
+        "Archflaire Edit Shop Categories",
 };
 
 const EditCategory = () => {

@@ -107,10 +107,10 @@ const menuGroups = [
         label: "Orders",
         route: "#",
         children: [
-          { label: "All Orders", route: "/orders" },
-          { label: "Pending Orders", route: "/orders/pending" },
-          { label: "Completed Orders", route: "/orders/completed" },
-          { label: "Failed Orders", route: "/orders/failed" }
+          { label: "All Orders", route: "/shop/orders" },
+          { label: "Pending Orders", route: "/shop/orders/pending" },
+          { label: "Completed Orders", route: "/shop/orders/completed" },
+          { label: "Failed Orders", route: "/shop/orders/failed" }
         ]
       },
       {
