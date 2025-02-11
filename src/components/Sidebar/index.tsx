@@ -18,7 +18,8 @@ import {
   PieChart,
   Boxes,
   Users2,
-  FolderKanban
+  FolderKanban,
+  Paintbrush // Added for designs
 } from "lucide-react";
 
 interface SidebarProps {
@@ -47,6 +48,15 @@ const menuGroups = [
         children: [
           { label: "All Projects", route: "/projects" },
           { label: "Add Project", route: "/projects/add" },
+        ]
+      },
+      {
+        icon: <Paintbrush size={18} />,
+        label: "Designs",
+        route: "#",
+        children: [
+          { label: "All Designs", route: "/designs" },
+          { label: "Create Design", route: "/designs/create" },
         ]
       }
     ]
