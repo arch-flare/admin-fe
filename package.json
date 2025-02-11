@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tinymce/tinymce-react": "^5.1.1",
     "@types/js-cookie": "^3.0.6",
     "apexcharts": "^3.45.2",
     "axios": "^1.7.9",
