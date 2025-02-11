@@ -13,7 +13,7 @@ const Editor = ({ value, onChange }: EditorProps) => {
 
     return (
         <TinyMCEEditor
-            apiKey="your-tinymce-api-key" // Replace with your TinyMCE API key
+            apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
             onInit={(evt, editor) => editorRef.current = editor}
             value={value}
             init={{

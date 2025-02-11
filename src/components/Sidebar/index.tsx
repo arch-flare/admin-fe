@@ -19,7 +19,9 @@ import {
   Boxes,
   Users2,
   FolderKanban,
-  Paintbrush // Added for designs
+  Paintbrush,
+  Tags,
+  ClipboardList
 } from "lucide-react";
 
 interface SidebarProps {
@@ -74,6 +76,26 @@ const menuGroups = [
         ]
       },
       {
+        icon: <ClipboardList size={18} />,
+        label: "Orders",
+        route: "#",
+        children: [
+          { label: "All Orders", route: "/shop/orders" },
+          { label: "Pending Orders", route: "/shop/orders/pending" },
+          { label: "Completed Orders", route: "/shop/orders/completed" },
+          { label: "Cancelled Orders", route: "/shop/orders/cancelled" }
+        ]
+      },
+      {
+        icon: <Tags size={18} />,
+        label: "Categories",
+        route: "#",
+        children: [
+          { label: "All Categories", route: "/shop/categories" },
+          { label: "Add Category", route: "/shop/categories/add" },
+        ]
+      },
+      {
         icon: <CreditCard size={18} />,
         label: "Payments",
         route: "#",
@@ -83,62 +105,6 @@ const menuGroups = [
           { label: "Failed Payments", route: "/payments/failed" },
           { label: "MPesa Transactions", route: "/payments/mpesa" }
         ]
-      }
-    ]
-  },
-  {
-    name: "SETTINGS",
-    menuItems: [
-      {
-        icon: <Settings size={18} />,
-        label: "Store Settings",
-        route: "#",
-        children: [
-          { label: "General Settings", route: "/settings/general" },
-          { label: "Payment Settings", route: "/settings/payment" },
-          { label: "Shipping Settings", route: "/settings/shipping" },
-          { label: "Tax Settings", route: "/settings/tax" }
-        ]
-      },
-      {
-        icon: <Users size={18} />,
-        label: "User Management",
-        route: "#",
-        children: [
-          { label: "All Users", route: "/users" },
-          { label: "User Roles", route: "/users/roles" },
-          { label: "Permissions", route: "/users/permissions" }
-        ]
-      },
-      {
-        icon: <Activity size={18} />,
-        label: "System Logs",
-        route: "#",
-        children: [
-          { label: "Activity Logs", route: "/logs/activity" },
-          { label: "Error Logs", route: "/logs/error" },
-          { label: "Payment Logs", route: "/logs/payment" }
-        ]
-      }
-    ]
-  },
-  {
-    name: "REPORTS & ANALYTICS",
-    menuItems: [
-      {
-        icon: <PieChart size={18} />,
-        label: "Sales Analytics",
-        route: "/analytics/sales"
-      },
-      {
-        icon: <Boxes size={18} />,
-        label: "Inventory Reports",
-        route: "/reports/inventory"
-      },
-      {
-        icon: <Users2 size={18} />,
-        label: "Customer Analytics",
-        route: "/analytics/customers"
       }
     ]
   }
