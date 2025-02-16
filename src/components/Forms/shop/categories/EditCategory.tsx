@@ -11,7 +11,7 @@ interface Category {
     id: number;
     name: string;
     description: string | null;
-    image: string | null;
+    image_url: string | null;
     is_active: boolean | number;
     created_at: string;
     updated_at: string;
@@ -60,7 +60,7 @@ const EditShopCategory = () => {
                     });
                     if (category.image) {
                         setOriginalImage(category.image);
-                        setImagePreview(category.image);
+                        setImagePreview(category.image_url);
                     }
                 } else {
                     setError("Category not found");

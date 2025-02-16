@@ -10,7 +10,7 @@ interface Category {
     name: string;
     slug: string;
     description: string | null;
-    image: string | null;
+    image_url: string | null;
     is_active: boolean;
     created_at: string;
     updated_at: string;
@@ -128,13 +128,6 @@ const ShopCategoryTable = () => {
                                 </td>
                                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                                     <div className="flex items-center space-x-3.5">
-                                        <button
-                                            className="hover:text-primary"
-                                            onClick={() => navigate.push(`/categories/${category.id}`)}
-                                            title="View Category"
-                                        >
-                                            <Eye className="h-5 w-5" />
-                                        </button>
                                         <button
                                             className="hover:text-primary"
                                             onClick={() => navigate.push(`/shop/categories/edit/${category.id}`)}

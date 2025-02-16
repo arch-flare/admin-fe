@@ -2,7 +2,6 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import ShopCategoryTable from "@/components/Tables/shop/CategoryTable";
 import DesignTable from "@/components/Tables/DesignTable";
 
 export const metadata: Metadata = {
