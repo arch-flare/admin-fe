@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslations } from 'next-intl';
 import { post } from "@/utils/api";
 import { toast } from "react-toastify";
 
@@ -13,7 +12,6 @@ interface ForgotPasswordResponse {
 }
 
 const ForgotPasswordForm: React.FC = () => {
-    const t = useTranslations('ForgotPasswordForm');
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -23,19 +21,19 @@ const ForgotPasswordForm: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response:any = await post('auth/forgot-password', {
+            const response: any = await post('auth/forgot-password', {
                 email,
             });
 
-            toast.success(response.message || t('notifications.success'));
+            toast.success(response.message || 'Password reset instructions sent to your email');
 
-            // Optionally redirect to login page after a short delay
+            // Redirect to login page after a short delay
             setTimeout(() => {
                 router.push('/auth/signin');
             }, 5000);
 
         } catch (error: any) {
-            const errorMessage = error.response?.data?.message || t('notifications.error');
+            const errorMessage = error.response?.data?.message || 'Failed to process password reset request';
             toast.error(errorMessage);
         } finally {
             setIsLoading(false);
@@ -45,10 +43,10 @@ const ForgotPasswordForm: React.FC = () => {
     return (
         <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
             <span className="mb-1.5 block font-medium">
-                {t('header.startFree')}
+                Start for free
             </span>
             <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
-                {t('header.title')}
+                Forgot Password?
             </h2>
 
             <form onSubmit={handleSubmit}>
@@ -57,7 +55,7 @@ const ForgotPasswordForm: React.FC = () => {
                         className="mb-2.5 block font-medium text-black dark:text-white"
                         htmlFor="email"
                     >
-                        {t('fields.email.label')}
+                        Email
                     </label>
                     <div className="relative">
                         <input
@@ -65,9 +63,9 @@ const ForgotPasswordForm: React.FC = () => {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder={t('fields.email.placeholder')}
+                            placeholder="Enter your email"
                             className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                            aria-label={t('fields.email.label')}
+                            aria-label="Email input"
                             required
                             disabled={isLoading}
                         />
@@ -96,22 +94,22 @@ const ForgotPasswordForm: React.FC = () => {
                     <button
                         type="submit"
                         className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label={t('buttons.resetPassword.ariaLabel')}
+                        aria-label="Reset password button"
                         disabled={isLoading}
                     >
-                        {isLoading ? t('buttons.resetPassword.loading') : t('buttons.resetPassword.text')}
+                        {isLoading ? 'Sending Reset Link...' : 'Reset Password'}
                     </button>
                 </div>
 
                 <div className="mt-6 text-center">
                     <p>
-                        {t('backToLogin.text')}{" "}
+                        Remember your password?{" "}
                         <Link
                             href="/auth/signin"
                             className="text-primary"
-                            aria-label={t('backToLogin.linkLabel')}
+                            aria-label="Sign in link"
                         >
-                            {t('backToLogin.link')}
+                            Sign in
                         </Link>
                     </p>
                 </div>

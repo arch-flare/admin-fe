@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTranslations } from 'next-intl';
 import { toast } from "react-toastify";
 import { post } from "@/utils/api";
 
@@ -15,7 +14,6 @@ interface ResetPasswordResponse {
 }
 
 const ResetPasswordForm: React.FC = () => {
-    const t = useTranslations('ResetPasswordForm');
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -40,7 +38,7 @@ const ResetPasswordForm: React.FC = () => {
             }));
         } else {
             // Redirect to forgot password if parameters are missing
-            toast.error(t('notifications.invalidLink'));
+            toast.error('Invalid or expired password reset link');
             router.push('/auth/forgot-password');
         }
     }, [searchParams, router]);
@@ -52,7 +50,7 @@ const ResetPasswordForm: React.FC = () => {
         try {
             const response: any = await post('auth/reset-password', formData);
 
-            toast.success(response.message || t('notifications.success'));
+            toast.success(response.message || 'Password reset successful');
 
             // If the API returns a token, store it
             if (response.access_token) {
@@ -63,7 +61,7 @@ const ResetPasswordForm: React.FC = () => {
             router.push('/auth/signin');
 
         } catch (error: any) {
-            const errorMessage = error.response?.data?.message || t('notifications.error');
+            const errorMessage = error.response?.data?.message || 'Failed to reset password';
             toast.error(errorMessage);
         } finally {
             setIsLoading(false);
@@ -73,13 +71,13 @@ const ResetPasswordForm: React.FC = () => {
     return (
         <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
             <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
-                {t('header.title')}
+                Reset Password
             </h2>
 
             <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                     <label className="mb-2.5 block font-medium text-black dark:text-white">
-                        {t('fields.email.label')}
+                        Email
                     </label>
                     <input
                         type="email"
@@ -91,13 +89,13 @@ const ResetPasswordForm: React.FC = () => {
 
                 <div className="mb-4">
                     <label className="mb-2.5 block font-medium text-black dark:text-white">
-                        {t('fields.password.label')}
+                        New Password
                     </label>
                     <input
                         type="password"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        placeholder={t('fields.password.placeholder')}
+                        placeholder="Enter your new password"
                         className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white"
                         required
                     />
@@ -105,13 +103,13 @@ const ResetPasswordForm: React.FC = () => {
 
                 <div className="mb-6">
                     <label className="mb-2.5 block font-medium text-black dark:text-white">
-                        {t('fields.confirmPassword.label')}
+                        Confirm New Password
                     </label>
                     <input
                         type="password"
                         value={formData.password_confirmation}
                         onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
-                        placeholder={t('fields.confirmPassword.placeholder')}
+                        placeholder="Confirm your new password"
                         className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white"
                         required
                     />
@@ -122,7 +120,7 @@ const ResetPasswordForm: React.FC = () => {
                     className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isLoading}
                 >
-                    {isLoading ? t('buttons.submit.loading') : t('buttons.submit.text')}
+                    {isLoading ? 'Resetting Password...' : 'Reset Password'}
                 </button>
             </form>
         </div>

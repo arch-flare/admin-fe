@@ -2,23 +2,16 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
-import { useTranslations } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
 import ResetPasswordForm from "@/components/Forms/auth/reset-password-form";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('ForgotPassword');
-  return {
-    title: t('metadata.title'),
-    description: t('metadata.description'),
-  };
-}
+export const metadata: Metadata = {
+  title: 'Reset Password',
+  description: 'Reset your account password',
+};
 
 const ResetPassword: React.FC = () => {
-  const t = useTranslations('ResetPassword');
-
   return (
     <div className="flex flex-wrap items-center">
       <ToastContainer />
@@ -27,26 +20,26 @@ const ResetPassword: React.FC = () => {
           <Link
             className="mb-5.5 inline-block"
             href="/"
-            aria-label={t('accessibility.homeLink')}
+            aria-label="Go to home page"
           >
             <Image
               className="hidden dark:block"
               src={"/logos/logo.png"}
-              alt={t('accessibility.logo')}
+              alt="Site logo"
               width={176}
               height={32}
             />
             <Image
               className="dark:hidden"
               src={"/logos/logo.png"}
-              alt={t('accessibility.logo')}
+              alt="Site logo"
               width={176}
               height={32}
             />
           </Link>
 
           <p className="2xl:px-20">
-            {t('tagline')}
+            Reset your password securely and regain access to your account
           </p>
         </div>
       </div>
