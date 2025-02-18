@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Cookies from 'js-cookie';
 import ClickOutside from "@/components/ClickOutside";
-import { post } from "@/utils/api"; // Import the API utility
+import { post } from "@/utils/api";
 
 interface UserDetails {
   id: number;
@@ -11,6 +11,15 @@ interface UserDetails {
   role: string;
   profile_photo_path: string;
 }
+
+const getInitials = (name: string): string => {
+  return name
+    .split(' ')
+    .map(word => word.charAt(0))
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+};
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -28,7 +37,6 @@ const DropdownUser = () => {
       }
 
       try {
-        // Try to get user from localStorage first
         const cachedUser = localStorage.getItem('user_data');
         if (cachedUser) {
           setUserDetails(JSON.parse(cachedUser));
@@ -36,7 +44,6 @@ const DropdownUser = () => {
           return;
         }
 
-        // If no cached user, fetch from API
         const response = await post('/auth/profile');
         if (response.status) {
           const userData = response.data;
@@ -55,12 +62,10 @@ const DropdownUser = () => {
 
   const handleLogout = async () => {
     try {
-      // Call logout endpoint
       await post('/auth/logout');
     } catch (error) {
       console.error('Error during logout:', error);
     } finally {
-      // Clean up regardless of API call success
       Cookies.remove('auth_token');
       localStorage.removeItem('user_data');
       setUserDetails(null);
@@ -81,6 +86,8 @@ const DropdownUser = () => {
     );
   }
 
+  const userInitials = userDetails?.name ? getInitials(userDetails.name) : 'GU';
+
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <button
@@ -97,14 +104,21 @@ const DropdownUser = () => {
             Admin
           </span>
         </span>
+
         <span className="h-12 w-12 rounded-full">
-          <img
-            width={48}
-            height={48}
-            src={userDetails?.profile_photo_path || "/images/user/user-placeholder.png"}
-            alt="User avatar"
-            className="rounded-full"
-          />
+          {userDetails?.profile_photo_path ? (
+            <img
+              width={48}
+              height={48}
+              src={userDetails.profile_photo_path}
+              alt="User avatar"
+              className="rounded-full"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center rounded-full bg-primary text-white">
+              {userInitials}
+            </div>
+          )}
         </span>
         <span className="hidden sm:block" aria-hidden="true">▼</span>
       </button>
@@ -115,7 +129,7 @@ const DropdownUser = () => {
           role="menu"
           aria-orientation="vertical"
         >
-          <ul
+          {/* <ul
             className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark"
             role="none"
           >
@@ -128,7 +142,7 @@ const DropdownUser = () => {
                 My Profile
               </Link>
             </li>
-          </ul>
+          </ul> */}
           <button
             onClick={handleLogout}
             className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"

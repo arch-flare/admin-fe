@@ -13,6 +13,7 @@ interface Product {
     stock_quantity: number;
     sku: string;
     is_active: boolean;
+    image_urls: string[];
     images: string[];
     category: {
         id: number;
@@ -123,7 +124,7 @@ const ProductsTable = () => {
                                     <div className="flex items-center gap-3">
                                         <div className="h-12 w-12 overflow-hidden rounded-lg">
                                             <img
-                                                src={product.images[0] || '/api/placeholder/48/48'}
+                                                src={product.image_urls[0] || '/api/placeholder/48/48'}
                                                 alt={product.name}
                                                 className="h-full w-full object-cover"
                                             />

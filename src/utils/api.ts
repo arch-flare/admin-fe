@@ -6,7 +6,7 @@ import axios, {
 } from "axios";
 import Cookies from "js-cookie";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://archflaire.mchessacademy.co.ke/api/";
 
 interface ApiResponse<T = any> {
   data: T;

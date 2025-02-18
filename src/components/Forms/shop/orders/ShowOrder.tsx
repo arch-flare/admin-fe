@@ -10,6 +10,7 @@ interface Product {
     id: number;
     name: string;
     price: number;
+    image_urls: string[];
     images: string[];
 }
 
@@ -20,17 +21,6 @@ interface OrderItem {
     price: number;
 }
 
-interface Address {
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    country: string;
-    postal_code: string;
-}
-
 interface Order {
     id: number;
     order_number: string;
@@ -39,8 +29,14 @@ interface Order {
     payment_status: string;
     payment_method: string;
     mpesa_transaction_id: string | null;
-    shipping_address: Address;
-    billing_address: Address;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    postal_code: string;
+    order_notes: string;
     created_at: string;
     items: OrderItem[];
 }
@@ -57,7 +53,7 @@ const ShowOrder = () => {
             try {
                 setLoading(true);
                 const response: any = await get(`/orders/${id}`);
-                
+
                 if (response.status) {
                     setOrder(response.order);
                 }
@@ -110,7 +106,7 @@ const ShowOrder = () => {
             <div className="rounded-sm border border-stroke bg-white p-8 text-center shadow-default dark:border-strokedark dark:bg-boxdark">
                 <p className="text-danger">{error || 'Order not found'}</p>
                 <button
-                    onClick={() => router.push('/orders')}
+                    onClick={() => router.push('/shop/orders')}
                     className="mt-4 inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-white hover:bg-opacity-90"
                 >
                     Back to Orders
@@ -137,7 +133,7 @@ const ShowOrder = () => {
                             {order.status}
                         </Badge>
                         <button
-                            onClick={() => router.push('/orders')}
+                            onClick={() => router.push('/shop/orders')}
                             className="inline-flex items-center gap-2 rounded bg-body px-4 py-2 text-black hover:bg-opacity-90 dark:bg-meta-4 dark:text-white"
                         >
                             <ArrowLeft className="h-5 w-5" /> Back to Orders
@@ -177,7 +173,7 @@ const ShowOrder = () => {
                                             <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                                                 <div className="flex items-center gap-3">
                                                     <img
-                                                        src={item.product.images[0] || '/api/placeholder/48/48'}
+                                                        src={item.product.image_urls[0] || '/api/placeholder/48/48'}
                                                         alt={item.product.name}
                                                         className="h-12 w-12 rounded-lg object-cover"
                                                     />
@@ -221,48 +217,28 @@ const ShowOrder = () => {
                     </div>
                 </div>
 
-                {/* Addresses and Payment Info */}
+                {/* Customer Information and Payment Info */}
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                    {/* Shipping Address */}
+                    {/* Customer Information */}
                     <div>
                         <h4 className="mb-4 text-xl font-semibold text-black dark:text-white">
-                            Shipping Address
+                            Customer Information
                         </h4>
                         <div className="rounded-sm border border-stroke p-4 dark:border-strokedark">
                             <p className="font-medium text-black dark:text-white">
-                                {order.shipping_address.first_name} {order.shipping_address.last_name}
+                                {order.first_name} {order.last_name}
                             </p>
-                            <p className="mt-2 text-meta-3">{order.shipping_address.email}</p>
-                            <p className="text-meta-3">{order.shipping_address.phone}</p>
-                            <p className="mt-2 text-meta-3">{order.shipping_address.address}</p>
+                            <p className="mt-2 text-meta-3">{order.email}</p>
+                            <p className="text-meta-3">{order.phone}</p>
+                            <p className="mt-2 text-meta-3">{order.address}</p>
                             <p className="text-meta-3">
-                                {order.shipping_address.city}, {order.shipping_address.postal_code}
+                                {order.city}, {order.postal_code}
                             </p>
-                            <p className="text-meta-3">{order.shipping_address.country}</p>
-                        </div>
-                    </div>
-
-                    {/* Billing Address */}
-                    <div>
-                        <h4 className="mb-4 text-xl font-semibold text-black dark:text-white">
-                            Billing Address
-                        </h4>
-                        <div className="rounded-sm border border-stroke p-4 dark:border-strokedark">
-                            <p className="font-medium text-black dark:text-white">
-                                {order.billing_address.first_name} {order.billing_address.last_name}
-                            </p>
-                            <p className="mt-2 text-meta-3">{order.billing_address.email}</p>
-                            <p className="text-meta-3">{order.billing_address.phone}</p>
-                            <p className="mt-2 text-meta-3">{order.billing_address.address}</p>
-                            <p className="text-meta-3">
-                                {order.billing_address.city}, {order.billing_address.postal_code}
-                            </p>
-                            <p className="text-meta-3">{order.billing_address.country}</p>
                         </div>
                     </div>
 
                     {/* Payment Information */}
-                    <div className="md:col-span-2">
+                    <div>
                         <h4 className="mb-4 text-xl font-semibold text-black dark:text-white">
                             Payment Information
                         </h4>
@@ -291,6 +267,18 @@ const ShowOrder = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Order Notes */}
+                    {order.order_notes && (
+                        <div className="md:col-span-2">
+                            <h4 className="mb-4 text-xl font-semibold text-black dark:text-white">
+                                Order Notes
+                            </h4>
+                            <div className="rounded-sm border border-stroke p-4 dark:border-strokedark">
+                                <p className="text-meta-3">{order.order_notes}</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

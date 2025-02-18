@@ -80,10 +80,7 @@ const menuGroups = [
         label: "Orders",
         route: "#",
         children: [
-          { label: "All Orders", route: "/shop/orders" },
-          { label: "Pending Orders", route: "/shop/orders/pending" },
-          { label: "Completed Orders", route: "/shop/orders/completed" },
-          { label: "Cancelled Orders", route: "/shop/orders/cancelled" }
+          { label: "All Orders", route: "/shop/orders" }
         ]
       },
       {
@@ -95,17 +92,17 @@ const menuGroups = [
           { label: "Add Category", route: "/shop/categories/add" },
         ]
       },
-      {
-        icon: <CreditCard size={18} />,
-        label: "Payments",
-        route: "#",
-        children: [
-          { label: "All Transactions", route: "/payments" },
-          { label: "Successful Payments", route: "/payments/successful" },
-          { label: "Failed Payments", route: "/payments/failed" },
-          { label: "MPesa Transactions", route: "/payments/mpesa" }
-        ]
-      }
+      // {
+      //   icon: <CreditCard size={18} />,
+      //   label: "Payments",
+      //   route: "#",
+      //   children: [
+      //     { label: "All Transactions", route: "/payments" },
+      //     { label: "Successful Payments", route: "/payments/successful" },
+      //     { label: "Failed Payments", route: "/payments/failed" },
+      //     { label: "MPesa Transactions", route: "/payments/mpesa" }
+      //   ]
+      // }
     ]
   }
 ];
