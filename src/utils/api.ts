@@ -6,7 +6,8 @@ import axios, {
 } from "axios";
 import Cookies from "js-cookie";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://archflaire.mchessacademy.co.ke/api/";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://archflaire.com/api/";
+const STORAGE_URL = process.env.NEXT_PUBLIC_STORAGE_URL || "https://archflaire.com/storage/";
 
 interface ApiResponse<T = any> {
   data: T;
@@ -111,5 +112,18 @@ export const remove = <T = any>(
   url: string,
   params: object = {},
 ): Promise<ApiResponse<T>> => api.delete<T, ApiResponse<T>>(url, { params });
+
+// Helper function to format image URLs
+export const getFullImageUrl = (imagePath: string): string => {
+  // Check if the path already includes the storage URL
+  if (imagePath.startsWith('http')) {
+      return imagePath;
+  }
+  
+  // Remove any leading slash to avoid double slashes
+  const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
+  
+  return `${STORAGE_URL}${cleanPath}`;
+};
 
 export default api;

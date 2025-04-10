@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { get, post } from "@/utils/api";
+import { get, getFullImageUrl, post } from "@/utils/api";
 import { Loader2, Upload, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -191,8 +191,8 @@ const EditDesign = () => {
                         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                             {existingImages.map((image) => (
                                 <div key={image.id} className="relative group">
-                                    <Image
-                                        src={`/storage/${image.image_path}`}
+                                    <img
+                                        src={getFullImageUrl(image.image_path)}
                                         alt="Design image"
                                         width={200}
                                         height={200}

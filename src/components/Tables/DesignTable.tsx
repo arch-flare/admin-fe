@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { get } from "@/utils/api";
+import { get, remove } from "@/utils/api";
 import { Eye, Pencil, Trash2, Plus, Image as ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { truncateDescription } from "@/utils/helper";
 
 interface Design {
     id: number;
@@ -62,7 +63,7 @@ const DesignTable = () => {
     const handleDelete = async (id: number) => {
         if (window.confirm('Are you sure you want to delete this design?')) {
             try {
-                await get(`/designs/${id}`);
+                await remove(`/designs/${id}`);
                 setDesigns(designs.filter(design => design.id !== id));
             } catch (err) {
                 console.error('Error deleting design:', err);
@@ -111,7 +112,9 @@ const DesignTable = () => {
                                     <h5 className="font-medium text-black dark:text-white">
                                         {design.title}
                                     </h5>
-                                    <p className="text-sm">{design.description}</p>
+                                    <p className="text-sm">
+                                        {truncateDescription(design.description)}
+                                    </p>
                                 </td>
                                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                                     <div className="flex items-center gap-2">
@@ -126,13 +129,6 @@ const DesignTable = () => {
                                 </td>
                                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                                     <div className="flex items-center space-x-3.5">
-                                        <button
-                                            className="hover:text-primary"
-                                            onClick={() => navigate.push(`/designs/${design.id}/show`)}
-                                            title="View Design"
-                                        >
-                                            <Eye className="h-5 w-5" />
-                                        </button>
                                         <button
                                             className="hover:text-primary"
                                             onClick={() => navigate.push(`/designs/${design.id}/edit`)}

@@ -41,7 +41,6 @@ const EditProject = () => {
     const [fetchLoading, setFetchLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Get project ID from URL
     const { id } = useParams();
 
     useEffect(() => {
@@ -54,13 +53,17 @@ const EditProject = () => {
 
                 if (response.status && response.project) {
                     const project = response.project;
+                    // Normalize the dates to YYYY-MM-DD format
+                    const startDate = project.start_date.split("T")[0]; // Extract YYYY-MM-DD
+                    const endDate = project.end_date ? project.end_date.split("T")[0] : "";
+                    
                     setFormData({
                         title: project.title,
                         description: project.description || "",
                         location: project.location,
                         status: project.status,
-                        start_date: project.start_date,
-                        end_date: project.end_date || "",
+                        start_date: startDate,
+                        end_date: endDate,
                     });
                 } else {
                     setError("Project not found");
@@ -98,7 +101,7 @@ const EditProject = () => {
                     data.append(key, value);
                 }
             });
-            data.append("_method", "PUT"); // Laravel requires this for PUT requests
+            data.append("_method", "PUT");
 
             const response: any = await post(`/projects/${id}`, data);
 

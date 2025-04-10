@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { get } from "@/utils/api";
+import { get, remove } from "@/utils/api";
 import { Eye, Pencil, Trash2, Plus, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { truncateDescription } from "@/utils/helper";
 
 interface Project {
     id: number;
@@ -61,7 +62,7 @@ const ProjectTable = () => {
     const handleDelete = async (id: number) => {
         if (window.confirm('Are you sure you want to delete this project?')) {
             try {
-                await get(`/projects/${id}`);
+                await remove(`/projects/${id}`);
                 setProjects(projects.filter(project => project.id !== id));
             } catch (err) {
                 console.error('Error deleting project:', err);
@@ -80,6 +81,8 @@ const ProjectTable = () => {
                 return 'bg-danger text-danger';
         }
     };
+
+
 
     return (
         <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
@@ -124,7 +127,9 @@ const ProjectTable = () => {
                                     <h5 className="font-medium text-black dark:text-white">
                                         {project.title}
                                     </h5>
-                                    <p className="text-sm">{project.description}</p>
+                                    <p className="text-sm">
+                                        {truncateDescription(project.description)}
+                                    </p>
                                 </td>
                                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                                     <p className="text-black dark:text-white">

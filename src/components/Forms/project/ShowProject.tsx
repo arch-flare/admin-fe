@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { get } from "@/utils/api";
+import { get, getFullImageUrl, remove } from "@/utils/api";
 import {
     Loader2,
     Calendar,
@@ -95,7 +95,7 @@ const ShowProject = () => {
 
         if (window.confirm('Are you sure you want to delete this timeline?')) {
             try {
-                await get(`/projects/${project.id}/timelines/${timelineId}`);
+                await remove(`/projects/${project.id}/timelines/${timelineId}`);
                 setProject({
                     ...project,
                     timelines: project.timelines.filter(t => t.id !== timelineId)
@@ -239,7 +239,7 @@ const ShowProject = () => {
                                             {timeline.images.map((image) => (
                                                 <div key={image.id} className="relative aspect-square">
                                                     <img
-                                                        src={image.image_path}
+                                                        src={getFullImageUrl(image.image_path)}
                                                         alt={`Timeline image ${image.id}`}
                                                         className="w-full h-full object-cover rounded-lg"
                                                     />
