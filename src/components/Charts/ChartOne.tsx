@@ -8,7 +8,7 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
 
-const options: ApexOptions = {
+const baseOptions: ApexOptions = {
   legend: {
     show: false,
     position: "top",
@@ -89,20 +89,6 @@ const options: ApexOptions = {
   },
   xaxis: {
     type: "category",
-    categories: [
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-    ],
     axisBorder: {
       show: false,
     },
@@ -117,29 +103,39 @@ const options: ApexOptions = {
       },
     },
     min: 0,
-    max: 100,
   },
 };
 
-interface ChartOneState {
-  series: {
-    name: string;
-    data: number[];
-  }[];
+interface ChartOneProps {
+  categories?: string[];
+  revenue?: number[];
+  orders?: number[];
 }
 
-const ChartOne: React.FC = () => {
-  const series = [
-      {
-        name: "Product One",
-        data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45],
-      },
+const DEFAULT_CATEGORIES = [
+  "Sep", "Oct", "Nov", "Dec", "Jan", "Feb",
+  "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+];
 
-      {
-        name: "Product Two",
-        data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39, 51],
-      },
-    ]
+const ChartOne: React.FC<ChartOneProps> = ({ categories, revenue, orders }) => {
+  const options: ApexOptions = {
+    ...baseOptions,
+    xaxis: {
+      ...baseOptions.xaxis,
+      categories: categories ?? DEFAULT_CATEGORIES,
+    },
+  };
+
+  const series = [
+    {
+      name: "Revenue",
+      data: revenue ?? [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45],
+    },
+    {
+      name: "Orders",
+      data: orders ?? [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39, 51],
+    },
+  ];
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">

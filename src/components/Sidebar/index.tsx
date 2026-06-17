@@ -119,15 +119,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       >
         {/* <!-- SIDEBAR HEADER --> */}
         <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-          {/* <Link href="/">
-            <Image
-              width={176}
-              height={32}
-              src={"/images/logo/logo.svg"}
-              alt="Logo"
-              priority
-            />
-          </Link> */}
+          <Link href="/" className="group">
+            <span className="flex items-baseline uppercase tracking-[0.25em] text-white">
+              <span className="text-xl font-semibold">ARCH</span>
+              <span className="text-xl font-light text-white/80 transition-colors duration-300 group-hover:text-white">FLAIRE</span>
+            </span>
+          </Link>
 
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}

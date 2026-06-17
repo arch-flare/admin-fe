@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Cookies from 'js-cookie';
 import ClickOutside from "@/components/ClickOutside";
-import { post } from "@/utils/api";
+import { get, post } from "@/utils/api";
 
 interface UserDetails {
   id: number;
@@ -44,9 +44,9 @@ const DropdownUser = () => {
           return;
         }
 
-        const response = await post('/auth/profile');
+        const response: any = await get('/auth/profile');
         if (response.status) {
-          const userData = response.data;
+          const userData = response.user;
           localStorage.setItem('user_data', JSON.stringify(userData));
           setUserDetails(userData);
         }
@@ -129,20 +129,21 @@ const DropdownUser = () => {
           role="menu"
           aria-orientation="vertical"
         >
-          {/* <ul
+          <ul
             className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark"
             role="none"
           >
             <li role="none">
               <Link
-                href={`/profile/${userDetails?.id}/edit`}
+                href="/profile"
+                onClick={() => setDropdownOpen(false)}
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
                 role="menuitem"
               >
                 My Profile
               </Link>
             </li>
-          </ul> */}
+          </ul>
           <button
             onClick={handleLogout}
             className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"

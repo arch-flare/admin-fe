@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Metadata } from "next";
 import ForgotPasswordForm from "@/components/Forms/auth/forgot-password-form";
 import { ToastContainer } from "react-toastify";
@@ -18,24 +17,14 @@ const ForgotPassword: React.FC = () => {
       <div className="hidden w-full xl:block xl:w-1/2">
         <div className="px-26 py-17.5 text-center">
           <Link
-            className="mb-5.5 inline-block"
+            className="group mb-5.5 inline-block"
             href="/"
             aria-label="Go to home page"
           >
-            <Image
-              className="hidden dark:block"
-              src={"/logos/logo.png"}
-              alt="Site logo"
-              width={176}
-              height={32}
-            />
-            <Image
-              className="dark:hidden"
-              src={"/logos/logo.png"}
-              alt="Site logo"
-              width={176}
-              height={32}
-            />
+            <span className="flex items-baseline justify-center uppercase tracking-[0.25em] text-black dark:text-white">
+              <span className="text-2xl font-semibold">ARCH</span>
+              <span className="text-2xl font-light text-black/70 transition-colors duration-300 group-hover:text-black dark:text-white/80 dark:group-hover:text-white">FLAIRE</span>
+            </span>
           </Link>
 
           <p className="2xl:px-20">

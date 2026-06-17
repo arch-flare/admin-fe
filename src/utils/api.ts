@@ -48,16 +48,16 @@ api.interceptors.response.use(
     return response.data;
   },
   (error: AxiosError) => {
-    console.error("API Error:", error);
+    if (process.env.NODE_ENV !== "production") {
+      console.error("API Error:", error?.message);
+    }
 
-    if (error.response) {
-      console.error("Response Error Data:", error.response.data);
-      console.error("Response Error Status:", error.response.status);
-      console.error("Response Error Headers:", error.response.headers);
-    } else if (error.request) {
-      console.error("Request Error:", error.request);
-    } else {
-      console.error("Error Message:", error.message);
+    // On an expired/invalid session, clear the token and bounce to sign-in.
+    if (error.response?.status === 401 && typeof window !== "undefined") {
+      Cookies.remove("auth_token");
+      if (!window.location.pathname.startsWith("/auth/")) {
+        window.location.href = "/auth/signin";
+      }
     }
 
     return Promise.reject(error);
