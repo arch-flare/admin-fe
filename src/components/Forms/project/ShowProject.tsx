@@ -156,7 +156,7 @@ const ShowProject = () => {
                 data.append(`photos[${index}]`, photo);
             });
 
-            const response: any = await post(`/projects/${project.id}/photos`, data);
+            const response: any = await post(`/projects/${project.id}/photos`, data, { timeout: 300000 });
 
             if (response.status) {
                 setProject({
