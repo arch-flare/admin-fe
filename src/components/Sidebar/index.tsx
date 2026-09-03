@@ -21,7 +21,8 @@ import {
   FolderKanban,
   Paintbrush,
   Tags,
-  ClipboardList
+  ClipboardList,
+  CalendarClock
 } from "lucide-react";
 
 interface SidebarProps {
@@ -37,6 +38,11 @@ const menuGroups = [
         icon: <LayoutDashboard size={18} />,
         label: "Dashboard",
         route: "/",
+      },
+      {
+        icon: <CalendarClock size={18} />,
+        label: "Consultations",
+        route: "/consultations",
       }
     ]
   },
