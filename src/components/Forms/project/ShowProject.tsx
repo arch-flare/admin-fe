@@ -8,7 +8,6 @@ import {
     Calendar,
     MapPin,
     Clock,
-    Plus,
     Edit,
     Trash2,
     ImagePlus,
@@ -104,23 +103,6 @@ const ShowProject = () => {
                 return 'bg-warning text-warning';
             default:
                 return 'bg-danger text-danger';
-        }
-    };
-
-    const handleDeleteTimeline = async (timelineId: number) => {
-        if (!project) return;
-
-        if (window.confirm('Are you sure you want to delete this timeline?')) {
-            try {
-                await remove(`/projects/${project.id}/timelines/${timelineId}`);
-                setProject({
-                    ...project,
-                    timelines: project.timelines.filter(t => t.id !== timelineId)
-                });
-            } catch (err) {
-                console.error('Error deleting timeline:', err);
-                alert('Failed to delete timeline');
-            }
         }
     };
 
@@ -401,85 +383,6 @@ const ShowProject = () => {
                 </div>
             </div>
 
-            {/* Project Timelines Section */}
-            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-                <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
-                    <div className="flex items-center justify-between">
-                        <h3 className="font-medium text-black dark:text-white">
-                            Project Timeline
-                        </h3>
-                        <button
-                            onClick={() => router.push(`/projects/${project.id}/timelines/add`)}
-                            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-white hover:bg-opacity-90"
-                        >
-                            <Plus size={16} />
-                            Add Timeline
-                        </button>
-                    </div>
-                </div>
-
-                <div className="p-6.5">
-                    {project.timelines.length === 0 ? (
-                        <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-                            No timeline entries yet
-                        </div>
-                    ) : (
-                        <div className="space-y-6">
-                            {project.timelines.map((timeline) => (
-                                <div
-                                    key={timeline.id}
-                                    className="border border-stroke rounded-sm p-4 dark:border-strokedark"
-                                >
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div>
-                                            <h5 className="text-lg font-semibold text-black dark:text-white">
-                                                {timeline.title}
-                                            </h5>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                {new Date(timeline.timeline_date).toLocaleDateString()}
-                                            </p>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => router.push(`/projects/${project.id}/timelines/edit/${timeline.id}`)}
-                                                className="text-primary hover:text-primary/80"
-                                                title="Edit Timeline"
-                                            >
-                                                <Edit size={16} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteTimeline(timeline.id)}
-                                                className="text-danger hover:text-danger/80"
-                                                title="Delete Timeline"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <p className="mb-4 text-gray-600 dark:text-gray-300">
-                                        {timeline.description}
-                                    </p>
-
-                                    {timeline.images.length > 0 && (
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                            {timeline.images.map((image) => (
-                                                <div key={image.id} className="relative aspect-square">
-                                                    <img
-                                                        src={getFullImageUrl(image.image_path)}
-                                                        alt={`Timeline image ${image.id}`}
-                                                        className="w-full h-full object-cover rounded-lg"
-                                                    />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </div>
         </div>
     );
 };
