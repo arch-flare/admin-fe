@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { post } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const Editor = dynamic(() => import("@/components/Editor"), { ssr: false });
 
 export const AddProject = () => {
     const router = useRouter();
@@ -14,6 +17,9 @@ export const AddProject = () => {
         start_date: "",
         end_date: "",
         status: "pending",
+        featured_on_home: false,
+        home_excerpt: "",
+        home_order: 0,
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null);
@@ -188,13 +194,11 @@ export const AddProject = () => {
                         <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                             Description
                         </label>
-                        <textarea
-                            name="description"
-                            placeholder="Enter project description"
+                        <Editor
                             value={formData.description}
-                            onChange={handleChange}
-                            rows={4}
-                            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                            onChange={(content: string) =>
+                                setFormData((prev) => ({ ...prev, description: content }))
+                            }
                         />
                     </div>
 
@@ -289,6 +293,54 @@ export const AddProject = () => {
                             <option value="in_progress">In Progress</option>
                             <option value="completed">Completed</option>
                         </select>
+                    </div>
+
+                    <div className="mb-4.5 rounded border border-stroke p-4 dark:border-strokedark">
+                        <label className="flex cursor-pointer items-center gap-3 text-sm font-medium text-black dark:text-white">
+                            <input
+                                type="checkbox"
+                                checked={formData.featured_on_home}
+                                onChange={(e) =>
+                                    setFormData((prev) => ({ ...prev, featured_on_home: e.target.checked }))
+                                }
+                                className="h-4 w-4"
+                            />
+                            Feature this project in the home page &ldquo;Excellence in Every Detail&rdquo; section
+                        </label>
+
+                        {formData.featured_on_home && (
+                            <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_120px]">
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium text-black dark:text-white">
+                                        Home card summary
+                                    </label>
+                                    <textarea
+                                        rows={3}
+                                        maxLength={600}
+                                        placeholder="Short plain-text blurb shown on the home card (falls back to the description if left blank)"
+                                        value={formData.home_excerpt}
+                                        onChange={(e) =>
+                                            setFormData((prev) => ({ ...prev, home_excerpt: e.target.value }))
+                                        }
+                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent px-4 py-2.5 text-black outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium text-black dark:text-white">
+                                        Order
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        value={formData.home_order}
+                                        onChange={(e) =>
+                                            setFormData((prev) => ({ ...prev, home_order: Number(e.target.value) || 0 }))
+                                        }
+                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent px-4 py-2.5 text-black outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white"
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {error && (

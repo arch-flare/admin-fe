@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { get, post } from "@/utils/api";
 import { useParams, useRouter } from "next/navigation";
 import { ImagePlus, X, Loader2 } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const Editor = dynamic(() => import("@/components/Editor"), { ssr: false });
 
 interface Timeline {
     id: number;
@@ -189,14 +192,11 @@ const EditTimeline = () => {
                         <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                             Description <span className="text-meta-1">*</span>
                         </label>
-                        <textarea
-                            name="description"
-                            placeholder="Enter timeline description"
+                        <Editor
                             value={formData.description}
-                            onChange={handleChange}
-                            required
-                            rows={4}
-                            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                            onChange={(content: string) =>
+                                setFormData((prev) => ({ ...prev, description: content }))
+                            }
                         />
                     </div>
 

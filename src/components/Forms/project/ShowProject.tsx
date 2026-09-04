@@ -12,7 +12,8 @@ import {
     Edit,
     Trash2,
     ImagePlus,
-    X
+    X,
+    Star
 } from "lucide-react";
 
 interface TimelineImage {
@@ -38,6 +39,7 @@ interface ProjectPhoto {
     id: number;
     project_id: number;
     image_path: string;
+    is_home_cover?: boolean;
     created_at: string;
     updated_at: string;
 }
@@ -48,6 +50,7 @@ interface Project {
     description: string;
     location: string;
     status: 'pending' | 'in_progress' | 'completed';
+    featured_on_home?: boolean;
     start_date: string;
     end_date: string | null;
     created_at: string;
@@ -193,6 +196,30 @@ const ShowProject = () => {
         }
     };
 
+    const [settingCoverId, setSettingCoverId] = useState<number | null>(null);
+
+    const handleSetHomeCover = async (photoId: number) => {
+        if (!project) return;
+
+        setSettingCoverId(photoId);
+        try {
+            const response: any = await post(
+                `/projects/${project.id}/photos/${photoId}/home-cover`,
+                {}
+            );
+            if (response.status) {
+                setProject({ ...project, photos: response.photos });
+            } else {
+                alert('Failed to set the home cover photo');
+            }
+        } catch (err) {
+            console.error('Error setting home cover photo:', err);
+            alert('Failed to set the home cover photo');
+        } finally {
+            setSettingCoverId(null);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -233,9 +260,10 @@ const ShowProject = () => {
                         <h4 className="text-xl font-semibold text-black dark:text-white mb-2">
                             {project.title}
                         </h4>
-                        <p className="text-gray-500 dark:text-gray-400">
-                            {project.description}
-                        </p>
+                        <div
+                            className="prose prose-sm max-w-none text-gray-500 dark:text-gray-400"
+                            dangerouslySetInnerHTML={{ __html: project.description }}
+                        />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4.5">
@@ -336,6 +364,28 @@ const ShowProject = () => {
                                         alt={`Project photo ${photo.id}`}
                                         className="h-full w-full object-cover transition group-hover:scale-105"
                                     />
+                                    {photo.is_home_cover && (
+                                        <span className="absolute left-2 top-2 flex items-center gap-1 rounded bg-primary px-2 py-1 text-xs font-medium text-white">
+                                            <Star size={12} className="fill-current" />
+                                            Home cover
+                                        </span>
+                                    )}
+                                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-black/60 p-2 opacity-0 transition group-hover:opacity-100">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleSetHomeCover(photo.id)}
+                                            disabled={photo.is_home_cover || settingCoverId === photo.id}
+                                            className="flex items-center gap-1 rounded bg-white/90 px-2 py-1 text-xs font-medium text-black hover:bg-white disabled:cursor-default disabled:opacity-60"
+                                            title="Show this photo on the home page"
+                                        >
+                                            {settingCoverId === photo.id ? (
+                                                <Loader2 size={12} className="animate-spin" />
+                                            ) : (
+                                                <Star size={12} />
+                                            )}
+                                            {photo.is_home_cover ? 'Home cover' : 'Set as home cover'}
+                                        </button>
+                                    </div>
                                     <button
                                         type="button"
                                         onClick={() => handleDeletePhoto(photo.id)}
