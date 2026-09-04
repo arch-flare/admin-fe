@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { get, post } from "@/utils/api";
+import { get, post, getFullImageUrl } from "@/utils/api";
 import { useParams, useRouter } from "next/navigation";
 import { ImagePlus, X, Loader2 } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -58,12 +58,14 @@ const EditTimeline = () => {
                     setFormData({
                         title: timeline.title,
                         description: timeline.description,
-                        timeline_date: timeline.timeline_date,
+                        // <input type="date"> needs a bare YYYY-MM-DD; the API
+                        // returns a full timestamp.
+                        timeline_date: timeline.timeline_date.split("T")[0],
                     });
                     setExistingImages(timeline.images);
                 } else {
                     setError("Timeline not found");
-                    router.push(`/projects/${projectId}`);
+                    router.push(`/projects/${projectId}/show`);
                 }
             } catch (err) {
                 setError("Failed to fetch timeline details");
@@ -144,7 +146,7 @@ const EditTimeline = () => {
             const response = await post(`/projects/${projectId}/timelines/${timelineId}`, data);
 
             if (response.status) {
-                router.push(`/projects/${projectId}`);
+                router.push(`/projects/${projectId}/show`);
             } else {
                 setError("Failed to update timeline entry. Please try again.");
             }
@@ -251,7 +253,7 @@ const EditTimeline = () => {
                                 {existingImages.map((image) => (
                                     <div key={image.id} className="relative">
                                         <img
-                                            src={image.image_path}
+                                            src={getFullImageUrl(image.image_path)}
                                             alt={`Image ${image.id}`}
                                             className="w-full h-32 object-cover rounded-lg"
                                         />
@@ -312,7 +314,7 @@ const EditTimeline = () => {
                         </button>
                         <button
                             type="button"
-                            onClick={() => router.push(`/projects/${projectId}`)}
+                            onClick={() => router.push(`/projects/${projectId}/show`)}
                             className="flex w-full justify-center rounded bg-body p-3 font-medium text-black hover:bg-opacity-90 dark:bg-meta-4 dark:text-white"
                         >
                             Cancel

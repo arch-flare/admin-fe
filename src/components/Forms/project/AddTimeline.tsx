@@ -221,7 +221,7 @@ const AddTimeline = () => {
                         </button>
                         <button
                             type="button"
-                            onClick={() => router.push(`/projects/${projectId}`)}
+                            onClick={() => router.push(`/projects/${projectId}/show`)}
                             className="flex w-full justify-center rounded bg-body p-3 font-medium text-black hover:bg-opacity-90 dark:bg-meta-4 dark:text-white"
                         >
                             Cancel
