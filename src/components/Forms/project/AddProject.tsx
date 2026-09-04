@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { post } from "@/utils/api";
 import { useRouter } from "next/navigation";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, ImagePlus, X } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const Editor = dynamic(() => import("@/components/Editor"), { ssr: false });
@@ -21,6 +21,8 @@ export const AddProject = () => {
         home_excerpt: "",
         home_order: 0,
     });
+    const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
+    const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null);
     const [validationErrors, setValidationErrors] = useState({
@@ -122,6 +124,29 @@ export const AddProject = () => {
         return !Object.values(newErrors).some(error => error !== "");
     };
 
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files) return;
+
+        const newPhotos = Array.from(files).filter((file) => file.type.startsWith("image/"));
+        setSelectedPhotos((prev) => [...prev, ...newPhotos]);
+
+        newPhotos.forEach((file) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPhotoPreviewUrls((prev) => [...prev, reader.result as string]);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        e.target.value = "";
+    };
+
+    const removeSelectedPhoto = (index: number) => {
+        setSelectedPhotos((prev) => prev.filter((_, i) => i !== index));
+        setPhotoPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
@@ -143,10 +168,25 @@ export const AddProject = () => {
         try {
             const response: any = await post("/projects", formData);
             if (response.status) {
-                // Photos are uploaded on the project's own page, so go straight
-                // there instead of the list — that's where "Add Photos" lives.
-                if (response.project?.id) {
-                    router.push(`/projects/${response.project.id}/show`);
+                const projectId = response.project?.id;
+
+                // Upload any photos picked before the project existed.
+                if (projectId && selectedPhotos.length > 0) {
+                    const photoData = new FormData();
+                    selectedPhotos.forEach((photo, index) => {
+                        photoData.append(`photos[${index}]`, photo);
+                    });
+                    try {
+                        await post(`/projects/${projectId}/photos`, photoData, { timeout: 300000 });
+                    } catch (photoErr) {
+                        console.error("Error uploading project photos:", photoErr);
+                        // The project itself was created fine; let the admin add
+                        // photos from its page rather than losing the project.
+                    }
+                }
+
+                if (projectId) {
+                    router.push(`/projects/${projectId}/show`);
                 } else {
                     router.push('/projects');
                 }
@@ -206,6 +246,54 @@ export const AddProject = () => {
                                 setFormData((prev) => ({ ...prev, description: content }))
                             }
                         />
+                    </div>
+
+                    <div className="mb-4.5">
+                        <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                            Images
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="file"
+                                onChange={handlePhotoChange}
+                                accept="image/*"
+                                multiple
+                                className="hidden"
+                                id="project-image-upload"
+                            />
+                            <label
+                                htmlFor="project-image-upload"
+                                className="flex cursor-pointer items-center gap-3"
+                            >
+                                <div className="flex h-24 w-24 items-center justify-center rounded-lg border-2 border-dashed border-primary hover:bg-gray-1 dark:hover:bg-meta-4">
+                                    <ImagePlus className="h-8 w-8 text-primary" />
+                                </div>
+                                <span className="text-sm text-black dark:text-white">
+                                    Click to upload photos
+                                </span>
+                            </label>
+                        </div>
+
+                        {photoPreviewUrls.length > 0 && (
+                            <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
+                                {photoPreviewUrls.map((url, index) => (
+                                    <div key={index} className="relative">
+                                        <img
+                                            src={url}
+                                            alt={`Preview ${index + 1}`}
+                                            className="h-32 w-full rounded-lg object-cover"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeSelectedPhoto(index)}
+                                            className="absolute -right-2 -top-2 rounded-full bg-danger p-1 text-white hover:bg-opacity-90"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className="mb-4.5">
