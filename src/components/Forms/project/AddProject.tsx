@@ -141,9 +141,15 @@ export const AddProject = () => {
         setError(null);
 
         try {
-            const response = await post("/projects", formData);
+            const response: any = await post("/projects", formData);
             if (response.status) {
-                router.push('/projects');
+                // Photos are uploaded on the project's own page, so go straight
+                // there instead of the list — that's where "Add Photos" lives.
+                if (response.project?.id) {
+                    router.push(`/projects/${response.project.id}/show`);
+                } else {
+                    router.push('/projects');
+                }
             } else {
                 setError("Failed to create project. Please try again.");
             }
