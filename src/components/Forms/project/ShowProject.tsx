@@ -228,7 +228,7 @@ const ShowProject = () => {
                             Project Details
                         </h3>
                         <button
-                            onClick={() => router.push(`/projects/edit/${project.id}`)}
+                            onClick={() => router.push(`/projects/${project.id}/edit`)}
                             className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-white hover:bg-opacity-90"
                         >
                             <Edit size={16} />
