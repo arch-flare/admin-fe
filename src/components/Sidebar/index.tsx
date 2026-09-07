@@ -43,6 +43,11 @@ const menuGroups = [
         icon: <CalendarClock size={18} />,
         label: "Consultations",
         route: "/consultations",
+      },
+      {
+        icon: <Settings size={18} />,
+        label: "Settings",
+        route: "/settings",
       }
     ]
   },
