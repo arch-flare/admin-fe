@@ -1,5 +1,8 @@
 // Function to truncate description
+// Strips HTML first (descriptions now come from a rich-text editor), so table
+// previews read as plain text instead of showing raw <p> / <strong> markup.
 export const truncateDescription = (description: string, maxLength: number = 50) => {
-    if (description.length <= maxLength) return description;
-    return description.substring(0, maxLength) + '...';
+    const plain = description.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (plain.length <= maxLength) return plain;
+    return plain.substring(0, maxLength) + '...';
 };
