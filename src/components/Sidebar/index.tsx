@@ -7,6 +7,7 @@ import Image from "next/image";
 import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import useCrawlerSummary from "@/hooks/useCrawlerSummary";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -64,6 +65,16 @@ const menuGroups = [
     ]
   },
   {
+    name: "CRAWLER",
+    menuItems: [
+      {
+        label: "Crawler Runs",
+        route: "/crawler",
+        badgeKey: "crawler",
+      }
+    ]
+  },
+  {
     name: "SHOP",
     menuItems: [
       {
@@ -110,6 +121,7 @@ const menuGroups = [
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const pathname = usePathname();
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
+  const crawler = useCrawlerSummary();
 
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
@@ -164,6 +176,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       item={menuItem}
                       pageName={pageName}
                       setPageName={setPageName}
+                      badge={(menuItem as { badgeKey?: string }).badgeKey === "crawler" ? crawler : undefined}
                     />
                   ))}
                 </ul>

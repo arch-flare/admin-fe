@@ -27,15 +27,19 @@ const ProductsTable = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [page, setPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
+    const [total, setTotal] = useState(0);
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const response: any = await get('/products');
-                console.log('products response:', response.products.data);
+                const response: any = await get(`/products?page=${page}`);
                 if (response.status) {
                     setProducts(response.products.data);
+                    setLastPage(response.products.last_page);
+                    setTotal(response.products.total);
                 }
             } catch (err) {
                 setError('Failed to fetch products');
@@ -46,7 +50,7 @@ const ProductsTable = () => {
         };
 
         fetchProducts();
-    }, []);
+    }, [page]);
 
     const handleDelete = async (id: number) => {
         if (window.confirm('Are you sure you want to delete this product?')) {
@@ -191,6 +195,28 @@ const ProductsTable = () => {
                         ))}
                     </tbody>
                 </table>
+            </div>
+
+            <div className="flex items-center justify-between py-4">
+                <p className="text-sm text-black dark:text-white">
+                    Page {page} of {lastPage} ({total} products)
+                </p>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        disabled={page <= 1}
+                        className="rounded-md border border-stroke px-4 py-2 text-sm disabled:opacity-50 dark:border-strokedark dark:text-white"
+                    >
+                        Previous
+                    </button>
+                    <button
+                        onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
+                        disabled={page >= lastPage}
+                        className="rounded-md border border-stroke px-4 py-2 text-sm disabled:opacity-50 dark:border-strokedark dark:text-white"
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
         </div>
     );
