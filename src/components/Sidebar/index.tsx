@@ -21,7 +21,8 @@ import {
   FolderKanban,
   Paintbrush,
   Tags,
-  ClipboardList
+  ClipboardList,
+  Newspaper
 } from "lucide-react";
 
 interface SidebarProps {
@@ -59,6 +60,15 @@ const menuGroups = [
         children: [
           { label: "All Designs", route: "/designs" },
           { label: "Create Design", route: "/designs/create" },
+        ]
+      },
+      {
+        icon: <Newspaper size={18} />,
+        label: "Journal",
+        route: "#",
+        children: [
+          { label: "All Posts", route: "/journal" },
+          { label: "New Post", route: "/journal/create" },
         ]
       }
     ]
