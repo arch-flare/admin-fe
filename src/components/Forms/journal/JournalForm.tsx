@@ -199,7 +199,7 @@ export const JournalForm = ({ postId }: Props) => {
                                     <option key={s.slug} value={s.slug}>{s.label}</option>
                                 ))}
                             </select>
-                            <p className="mt-1 text-xs">The post appears under "Related reading" on that service page.</p>
+                            <p className="mt-1 text-xs">The post appears under &ldquo;Related reading&rdquo; on that service page.</p>
                         </div>
                         <div>
                             <label className={labelClass}>Publish date</label>
