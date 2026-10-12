@@ -3,7 +3,7 @@ import Link from "next/link";
 import SidebarDropdown from "@/components/Sidebar/SidebarDropdown";
 import { usePathname } from "next/navigation";
 
-const SidebarItem = ({ item, pageName, setPageName }: any) => {
+const SidebarItem = ({ item, pageName, setPageName, badge }: any) => {
   const handleClick = () => {
     const updatedPageName =
       pageName !== item.label.toLowerCase() ? item.label.toLowerCase() : "";
@@ -32,6 +32,18 @@ const SidebarItem = ({ item, pageName, setPageName }: any) => {
         >
           {item.icon}
           {item.label}
+          {badge && (badge.unseen_runs > 0 || badge.pending_products > 0 || badge.running) && (
+            <span
+              title={
+                badge.running
+                  ? "Crawler is running"
+                  : `${badge.unseen_runs} new run(s), ${badge.pending_products} product(s) awaiting review`
+              }
+              className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold text-white ${badge.running ? "animate-pulse bg-warning" : "bg-danger"}`}
+            >
+              {badge.running ? "Running" : badge.unseen_runs > 0 ? `${badge.unseen_runs} new` : badge.pending_products}
+            </span>
+          )}
           {item.children && (
             <svg
               className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${

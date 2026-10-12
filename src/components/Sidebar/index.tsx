@@ -7,6 +7,7 @@ import Image from "next/image";
 import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import useCrawlerSummary from "@/hooks/useCrawlerSummary";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -22,7 +23,8 @@ import {
   Paintbrush,
   Tags,
   ClipboardList,
-  Newspaper
+  Newspaper,
+  CalendarClock
 } from "lucide-react";
 
 interface SidebarProps {
@@ -38,6 +40,16 @@ const menuGroups = [
         icon: <LayoutDashboard size={18} />,
         label: "Dashboard",
         route: "/",
+      },
+      {
+        icon: <CalendarClock size={18} />,
+        label: "Consultations",
+        route: "/consultations",
+      },
+      {
+        icon: <Settings size={18} />,
+        label: "Settings",
+        route: "/settings",
       }
     ]
   },
@@ -70,6 +82,16 @@ const menuGroups = [
           { label: "All Posts", route: "/journal" },
           { label: "New Post", route: "/journal/create" },
         ]
+      }
+    ]
+  },
+  {
+    name: "CRAWLER",
+    menuItems: [
+      {
+        label: "Crawler Runs",
+        route: "/crawler",
+        badgeKey: "crawler",
       }
     ]
   },
@@ -120,6 +142,7 @@ const menuGroups = [
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const pathname = usePathname();
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
+  const crawler = useCrawlerSummary();
 
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
@@ -174,6 +197,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       item={menuItem}
                       pageName={pageName}
                       setPageName={setPageName}
+                      badge={(menuItem as { badgeKey?: string }).badgeKey === "crawler" ? crawler : undefined}
                     />
                   ))}
                 </ul>

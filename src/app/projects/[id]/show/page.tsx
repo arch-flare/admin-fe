@@ -5,15 +5,15 @@ import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import ShowProject from "@/components/Forms/project/ShowProject";
 
 export const metadata: Metadata = {
-    title: "Archflaire Edit Project",
+    title: "Archflaire Project Details",
     description:
-        "Archflaire Edit Project",
+        "Archflaire Project Details",
 };
 
-const Add = () => {
+const Show = () => {
     return (
         <DefaultLayout>
-            <Breadcrumb pageName="Edit Project" />
+            <Breadcrumb pageName="Project Details" />
 
             <div className="flex flex-col gap-10">
                 <ShowProject />
@@ -22,4 +22,4 @@ const Add = () => {
     );
 };
 
-export default Add;
+export default Show;

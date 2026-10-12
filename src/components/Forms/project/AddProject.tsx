@@ -3,7 +3,10 @@
 import { useState, useEffect } from "react";
 import { post } from "@/utils/api";
 import { useRouter } from "next/navigation";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, ImagePlus, X } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const Editor = dynamic(() => import("@/components/Editor"), { ssr: false });
 
 export const AddProject = () => {
     const router = useRouter();
@@ -14,7 +17,12 @@ export const AddProject = () => {
         start_date: "",
         end_date: "",
         status: "pending",
+        featured_on_home: false,
+        home_excerpt: "",
+        home_order: 0,
     });
+    const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
+    const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null);
     const [validationErrors, setValidationErrors] = useState({
@@ -116,6 +124,29 @@ export const AddProject = () => {
         return !Object.values(newErrors).some(error => error !== "");
     };
 
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files) return;
+
+        const newPhotos = Array.from(files).filter((file) => file.type.startsWith("image/"));
+        setSelectedPhotos((prev) => [...prev, ...newPhotos]);
+
+        newPhotos.forEach((file) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPhotoPreviewUrls((prev) => [...prev, reader.result as string]);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        e.target.value = "";
+    };
+
+    const removeSelectedPhoto = (index: number) => {
+        setSelectedPhotos((prev) => prev.filter((_, i) => i !== index));
+        setPhotoPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
@@ -135,9 +166,30 @@ export const AddProject = () => {
         setError(null);
 
         try {
-            const response = await post("/projects", formData);
+            const response: any = await post("/projects", formData);
             if (response.status) {
-                router.push('/projects');
+                const projectId = response.project?.id;
+
+                // Upload any photos picked before the project existed.
+                if (projectId && selectedPhotos.length > 0) {
+                    const photoData = new FormData();
+                    selectedPhotos.forEach((photo, index) => {
+                        photoData.append(`photos[${index}]`, photo);
+                    });
+                    try {
+                        await post(`/projects/${projectId}/photos`, photoData, { timeout: 300000 });
+                    } catch (photoErr) {
+                        console.error("Error uploading project photos:", photoErr);
+                        // The project itself was created fine; let the admin add
+                        // photos from its page rather than losing the project.
+                    }
+                }
+
+                if (projectId) {
+                    router.push(`/projects/${projectId}/show`);
+                } else {
+                    router.push('/projects');
+                }
             } else {
                 setError("Failed to create project. Please try again.");
             }
@@ -188,14 +240,60 @@ export const AddProject = () => {
                         <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                             Description
                         </label>
-                        <textarea
-                            name="description"
-                            placeholder="Enter project description"
+                        <Editor
                             value={formData.description}
-                            onChange={handleChange}
-                            rows={4}
-                            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                            onChange={(content: string) =>
+                                setFormData((prev) => ({ ...prev, description: content }))
+                            }
                         />
+                    </div>
+
+                    <div className="mb-4.5">
+                        <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                            Images
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="file"
+                                onChange={handlePhotoChange}
+                                accept="image/*"
+                                multiple
+                                className="hidden"
+                                id="project-image-upload"
+                            />
+                            <label
+                                htmlFor="project-image-upload"
+                                className="flex cursor-pointer items-center gap-3"
+                            >
+                                <div className="flex h-24 w-24 items-center justify-center rounded-lg border-2 border-dashed border-primary hover:bg-gray-1 dark:hover:bg-meta-4">
+                                    <ImagePlus className="h-8 w-8 text-primary" />
+                                </div>
+                                <span className="text-sm text-black dark:text-white">
+                                    Click to upload photos
+                                </span>
+                            </label>
+                        </div>
+
+                        {photoPreviewUrls.length > 0 && (
+                            <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
+                                {photoPreviewUrls.map((url, index) => (
+                                    <div key={index} className="relative">
+                                        <img
+                                            src={url}
+                                            alt={`Preview ${index + 1}`}
+                                            className="h-32 w-full rounded-lg object-cover"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeSelectedPhoto(index)}
+                                            className="absolute -right-2 -top-2 rounded-full bg-danger p-1 text-white hover:bg-opacity-90"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className="mb-4.5">
@@ -289,6 +387,54 @@ export const AddProject = () => {
                             <option value="in_progress">In Progress</option>
                             <option value="completed">Completed</option>
                         </select>
+                    </div>
+
+                    <div className="mb-4.5 rounded border border-stroke p-4 dark:border-strokedark">
+                        <label className="flex cursor-pointer items-center gap-3 text-sm font-medium text-black dark:text-white">
+                            <input
+                                type="checkbox"
+                                checked={formData.featured_on_home}
+                                onChange={(e) =>
+                                    setFormData((prev) => ({ ...prev, featured_on_home: e.target.checked }))
+                                }
+                                className="h-4 w-4"
+                            />
+                            Feature this project in the home page &ldquo;Excellence in Every Detail&rdquo; section
+                        </label>
+
+                        {formData.featured_on_home && (
+                            <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_120px]">
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium text-black dark:text-white">
+                                        Home card summary
+                                    </label>
+                                    <textarea
+                                        rows={3}
+                                        maxLength={600}
+                                        placeholder="Short plain-text blurb shown on the home card (falls back to the description if left blank)"
+                                        value={formData.home_excerpt}
+                                        onChange={(e) =>
+                                            setFormData((prev) => ({ ...prev, home_excerpt: e.target.value }))
+                                        }
+                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent px-4 py-2.5 text-black outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium text-black dark:text-white">
+                                        Order
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        value={formData.home_order}
+                                        onChange={(e) =>
+                                            setFormData((prev) => ({ ...prev, home_order: Number(e.target.value) || 0 }))
+                                        }
+                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent px-4 py-2.5 text-black outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white"
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {error && (

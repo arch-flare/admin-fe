@@ -8,11 +8,11 @@ import {
     Calendar,
     MapPin,
     Clock,
-    Plus,
     Edit,
     Trash2,
     ImagePlus,
-    X
+    X,
+    Star
 } from "lucide-react";
 
 interface TimelineImage {
@@ -38,6 +38,7 @@ interface ProjectPhoto {
     id: number;
     project_id: number;
     image_path: string;
+    is_home_cover?: boolean;
     created_at: string;
     updated_at: string;
 }
@@ -48,6 +49,7 @@ interface Project {
     description: string;
     location: string;
     status: 'pending' | 'in_progress' | 'completed';
+    featured_on_home?: boolean;
     start_date: string;
     end_date: string | null;
     created_at: string;
@@ -101,23 +103,6 @@ const ShowProject = () => {
                 return 'bg-warning text-warning';
             default:
                 return 'bg-danger text-danger';
-        }
-    };
-
-    const handleDeleteTimeline = async (timelineId: number) => {
-        if (!project) return;
-
-        if (window.confirm('Are you sure you want to delete this timeline?')) {
-            try {
-                await remove(`/projects/${project.id}/timelines/${timelineId}`);
-                setProject({
-                    ...project,
-                    timelines: project.timelines.filter(t => t.id !== timelineId)
-                });
-            } catch (err) {
-                console.error('Error deleting timeline:', err);
-                alert('Failed to delete timeline');
-            }
         }
     };
 
@@ -193,6 +178,30 @@ const ShowProject = () => {
         }
     };
 
+    const [settingCoverId, setSettingCoverId] = useState<number | null>(null);
+
+    const handleSetHomeCover = async (photoId: number) => {
+        if (!project) return;
+
+        setSettingCoverId(photoId);
+        try {
+            const response: any = await post(
+                `/projects/${project.id}/photos/${photoId}/home-cover`,
+                {}
+            );
+            if (response.status) {
+                setProject({ ...project, photos: response.photos });
+            } else {
+                alert('Failed to set the home cover photo');
+            }
+        } catch (err) {
+            console.error('Error setting home cover photo:', err);
+            alert('Failed to set the home cover photo');
+        } finally {
+            setSettingCoverId(null);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -219,7 +228,7 @@ const ShowProject = () => {
                             Project Details
                         </h3>
                         <button
-                            onClick={() => router.push(`/projects/edit/${project.id}`)}
+                            onClick={() => router.push(`/projects/${project.id}/edit`)}
                             className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-white hover:bg-opacity-90"
                         >
                             <Edit size={16} />
@@ -233,9 +242,10 @@ const ShowProject = () => {
                         <h4 className="text-xl font-semibold text-black dark:text-white mb-2">
                             {project.title}
                         </h4>
-                        <p className="text-gray-500 dark:text-gray-400">
-                            {project.description}
-                        </p>
+                        <div
+                            className="prose prose-sm max-w-none text-gray-500 dark:text-gray-400"
+                            dangerouslySetInnerHTML={{ __html: project.description }}
+                        />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4.5">
@@ -336,6 +346,28 @@ const ShowProject = () => {
                                         alt={`Project photo ${photo.id}`}
                                         className="h-full w-full object-cover transition group-hover:scale-105"
                                     />
+                                    {photo.is_home_cover && (
+                                        <span className="absolute left-2 top-2 flex items-center gap-1 rounded bg-primary px-2 py-1 text-xs font-medium text-white">
+                                            <Star size={12} className="fill-current" />
+                                            Home cover
+                                        </span>
+                                    )}
+                                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-black/60 p-2 opacity-0 transition group-hover:opacity-100">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleSetHomeCover(photo.id)}
+                                            disabled={photo.is_home_cover || settingCoverId === photo.id}
+                                            className="flex items-center gap-1 rounded bg-white/90 px-2 py-1 text-xs font-medium text-black hover:bg-white disabled:cursor-default disabled:opacity-60"
+                                            title="Show this photo on the home page"
+                                        >
+                                            {settingCoverId === photo.id ? (
+                                                <Loader2 size={12} className="animate-spin" />
+                                            ) : (
+                                                <Star size={12} />
+                                            )}
+                                            {photo.is_home_cover ? 'Home cover' : 'Set as home cover'}
+                                        </button>
+                                    </div>
                                     <button
                                         type="button"
                                         onClick={() => handleDeletePhoto(photo.id)}
@@ -351,85 +383,6 @@ const ShowProject = () => {
                 </div>
             </div>
 
-            {/* Project Timelines Section */}
-            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-                <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
-                    <div className="flex items-center justify-between">
-                        <h3 className="font-medium text-black dark:text-white">
-                            Project Timeline
-                        </h3>
-                        <button
-                            onClick={() => router.push(`/projects/${project.id}/timelines/add`)}
-                            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-white hover:bg-opacity-90"
-                        >
-                            <Plus size={16} />
-                            Add Timeline
-                        </button>
-                    </div>
-                </div>
-
-                <div className="p-6.5">
-                    {project.timelines.length === 0 ? (
-                        <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-                            No timeline entries yet
-                        </div>
-                    ) : (
-                        <div className="space-y-6">
-                            {project.timelines.map((timeline) => (
-                                <div
-                                    key={timeline.id}
-                                    className="border border-stroke rounded-sm p-4 dark:border-strokedark"
-                                >
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div>
-                                            <h5 className="text-lg font-semibold text-black dark:text-white">
-                                                {timeline.title}
-                                            </h5>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                {new Date(timeline.timeline_date).toLocaleDateString()}
-                                            </p>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => router.push(`/projects/${project.id}/timelines/edit/${timeline.id}`)}
-                                                className="text-primary hover:text-primary/80"
-                                                title="Edit Timeline"
-                                            >
-                                                <Edit size={16} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteTimeline(timeline.id)}
-                                                className="text-danger hover:text-danger/80"
-                                                title="Delete Timeline"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <p className="mb-4 text-gray-600 dark:text-gray-300">
-                                        {timeline.description}
-                                    </p>
-
-                                    {timeline.images.length > 0 && (
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                            {timeline.images.map((image) => (
-                                                <div key={image.id} className="relative aspect-square">
-                                                    <img
-                                                        src={getFullImageUrl(image.image_path)}
-                                                        alt={`Timeline image ${image.id}`}
-                                                        className="w-full h-full object-cover rounded-lg"
-                                                    />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </div>
         </div>
     );
 };

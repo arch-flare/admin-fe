@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { get, remove } from "@/utils/api";
-import { Eye, Pencil, Trash2, Plus, Clock } from "lucide-react";
+import { Eye, Pencil, Trash2, Plus, Clock, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { truncateDescription } from "@/utils/helper";
 
@@ -12,6 +12,7 @@ interface Project {
     description: string;
     location: string;
     status: 'pending' | 'in_progress' | 'completed';
+    featured_on_home?: boolean;
     start_date: string;
     end_date: string | null;
     created_at: string;
@@ -124,8 +125,17 @@ const ProjectTable = () => {
                         {projects.map((project) => (
                             <tr key={project.id}>
                                 <td className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                                    <h5 className="font-medium text-black dark:text-white">
+                                    <h5 className="flex items-center gap-2 font-medium text-black dark:text-white">
                                         {project.title}
+                                        {project.featured_on_home && (
+                                            <span
+                                                className="inline-flex items-center gap-1 rounded-full bg-primary bg-opacity-10 px-2 py-0.5 text-xs font-medium text-primary"
+                                                title="Shown in the home page &quot;Excellence in Every Detail&quot; section"
+                                            >
+                                                <Star size={10} className="fill-current" />
+                                                On home
+                                            </span>
+                                        )}
                                     </h5>
                                     <p className="text-sm">
                                         {truncateDescription(project.description)}
