@@ -23,6 +23,7 @@ import {
   Paintbrush,
   Tags,
   ClipboardList,
+  Newspaper,
   CalendarClock
 } from "lucide-react";
 
@@ -71,6 +72,15 @@ const menuGroups = [
         children: [
           { label: "All Designs", route: "/designs" },
           { label: "Create Design", route: "/designs/create" },
+        ]
+      },
+      {
+        icon: <Newspaper size={18} />,
+        label: "Journal",
+        route: "#",
+        children: [
+          { label: "All Posts", route: "/journal" },
+          { label: "New Post", route: "/journal/create" },
         ]
       }
     ]

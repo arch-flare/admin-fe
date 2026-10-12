@@ -1,5 +1,6 @@
 'use client';
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import posthog from "posthog-js";
 import { get } from "@/utils/api";
 
 interface UserDetails {
@@ -27,6 +28,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setLoading(true);
             const response = await get<any>("/user");
             setUser(response.data);
+            if (posthog.__loaded && response.data?.id) {
+                posthog.identify(String(response.data.id), {
+                    name: response.data.name,
+                    role: response.data.role,
+                });
+            }
         } catch (error) {
             console.error("Failed to fetch user:", error);
         } finally {
