@@ -8,10 +8,11 @@ import { Badge } from "@/components/Badge";
 
 export interface ConsultationRequest {
     id: number;
+    type: "consultation" | "inquiry";
     name: string;
     email: string;
-    phone: string;
-    service_type: "design" | "build" | "interior" | "full";
+    phone: string | null;
+    service_type: "design" | "build" | "interior" | "full" | null;
     project_location: string | null;
     budget_range: string | null;
     preferred_date: string | null;
@@ -21,12 +22,18 @@ export interface ConsultationRequest {
     created_at: string;
 }
 
-export const SERVICE_LABELS: Record<ConsultationRequest["service_type"], string> = {
+export const SERVICE_LABELS: Record<NonNullable<ConsultationRequest["service_type"]>, string> = {
     design: "Architectural design",
     build: "Construction & PM",
     interior: "Interior design",
     full: "Full design & build",
 };
+
+export const TYPE_TABS: { value: string; label: string }[] = [
+    { value: "", label: "All" },
+    { value: "consultation", label: "Consultations" },
+    { value: "inquiry", label: "Inquiries" },
+];
 
 export const STATUSES: ConsultationRequest["status"][] = [
     "new",
@@ -66,13 +73,15 @@ const ConsultationTable = () => {
     const [error, setError] = useState<string | null>(null);
     const [savingId, setSavingId] = useState<number | null>(null);
     const [statusFilter, setStatusFilter] = useState<string>("");
+    const [typeFilter, setTypeFilter] = useState<string>("");
     const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 });
 
-    const fetchRequests = async (page: number, status: string) => {
+    const fetchRequests = async (page: number, status: string, type: string) => {
         try {
             setLoading(true);
             const query = new URLSearchParams({ page: String(page) });
             if (status) query.set("status", status);
+            if (type) query.set("type", type);
             const response: any = await get(`/consultation-requests?${query.toString()}`);
             if (response.status) {
                 const data = response.consultation_requests;
@@ -92,9 +101,9 @@ const ConsultationTable = () => {
     };
 
     useEffect(() => {
-        fetchRequests(1, statusFilter);
+        fetchRequests(1, statusFilter, typeFilter);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [statusFilter]);
+    }, [statusFilter, typeFilter]);
 
     const updateStatus = async (id: number, status: string) => {
         const previous = rows;
@@ -130,8 +139,23 @@ const ConsultationTable = () => {
         <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6.5">
                 <h3 className="font-medium text-black dark:text-white">
-                    Consultation Requests ({pagination.total})
+                    Consultations &amp; Inquiries ({pagination.total})
                 </h3>
+                <div className="flex gap-1">
+                    {TYPE_TABS.map((tab) => (
+                        <button
+                            key={tab.value}
+                            onClick={() => setTypeFilter(tab.value)}
+                            className={`rounded px-3 py-1.5 text-sm font-medium ${
+                                typeFilter === tab.value
+                                    ? "bg-primary text-white"
+                                    : "text-body hover:text-primary dark:text-bodydark"
+                            }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
                 <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
@@ -148,7 +172,7 @@ const ConsultationTable = () => {
 
             {rows.length === 0 ? (
                 <p className="px-6 py-10 text-center text-sm text-body dark:text-bodydark">
-                    No consultation requests yet.
+                    Nothing here yet.
                 </p>
             ) : (
                 <div className="max-w-full overflow-x-auto">
@@ -159,7 +183,7 @@ const ConsultationTable = () => {
                                     Contact
                                 </th>
                                 <th className="min-w-[160px] px-4 py-4 font-medium text-black dark:text-white">
-                                    Service
+                                    Type / Service
                                 </th>
                                 <th className="min-w-[130px] px-4 py-4 font-medium text-black dark:text-white">
                                     Submitted
@@ -182,8 +206,17 @@ const ConsultationTable = () => {
                                     </td>
                                     <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                                         <p className="text-black dark:text-white">
-                                            {SERVICE_LABELS[row.service_type]}
+                                            {row.type === "inquiry"
+                                                ? "General inquiry"
+                                                : row.service_type
+                                                  ? SERVICE_LABELS[row.service_type]
+                                                  : "—"}
                                         </p>
+                                        {row.type === "inquiry" && row.message && (
+                                            <span className="line-clamp-1 max-w-[260px] text-sm text-meta-3">
+                                                {row.message}
+                                            </span>
+                                        )}
                                         {row.budget_range && (
                                             <span className="text-sm text-meta-3">{row.budget_range}</span>
                                         )}
@@ -242,14 +275,14 @@ const ConsultationTable = () => {
                     </p>
                     <div className="flex gap-2">
                         <button
-                            onClick={() => fetchRequests(pagination.currentPage - 1, statusFilter)}
+                            onClick={() => fetchRequests(pagination.currentPage - 1, statusFilter, typeFilter)}
                             disabled={pagination.currentPage === 1}
                             className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black hover:bg-gray-50 disabled:opacity-50 dark:border-strokedark dark:text-white"
                         >
                             Previous
                         </button>
                         <button
-                            onClick={() => fetchRequests(pagination.currentPage + 1, statusFilter)}
+                            onClick={() => fetchRequests(pagination.currentPage + 1, statusFilter, typeFilter)}
                             disabled={pagination.currentPage === pagination.totalPages}
                             className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black hover:bg-gray-50 disabled:opacity-50 dark:border-strokedark dark:text-white"
                         >
