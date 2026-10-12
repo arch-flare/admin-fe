@@ -105,15 +105,23 @@ const ConsultationDetail = () => {
                     </p>
 
                     <dl>
-                        <Row label="Service requested">{SERVICE_LABELS[item.service_type]}</Row>
-                        <Row label="Project location">{item.project_location}</Row>
-                        <Row label="Approx. budget">{item.budget_range}</Row>
-                        <Row label="Preferred date">
-                            {formatDate(item.preferred_date)}
-                            {item.preferred_time && (
-                                <span className="capitalize"> · {item.preferred_time}</span>
-                            )}
-                        </Row>
+                        {item.type === "inquiry" ? (
+                            <Row label="Type">General inquiry</Row>
+                        ) : (
+                            <>
+                                <Row label="Service requested">
+                                    {item.service_type ? SERVICE_LABELS[item.service_type] : null}
+                                </Row>
+                                <Row label="Project location">{item.project_location}</Row>
+                                <Row label="Approx. budget">{item.budget_range}</Row>
+                                <Row label="Preferred date">
+                                    {formatDate(item.preferred_date)}
+                                    {item.preferred_time && (
+                                        <span className="capitalize"> · {item.preferred_time}</span>
+                                    )}
+                                </Row>
+                            </>
+                        )}
                         <Row label="Message">
                             <p className="whitespace-pre-line leading-relaxed">{item.message}</p>
                         </Row>
@@ -131,12 +139,14 @@ const ConsultationDetail = () => {
                         >
                             <Mail className="h-4 w-4" /> {item.email}
                         </a>
-                        <a
-                            href={`tel:${item.phone.replace(/\s+/g, "")}`}
-                            className="flex items-center gap-2 text-black hover:text-primary dark:text-white"
-                        >
-                            <Phone className="h-4 w-4" /> {item.phone}
-                        </a>
+                        {item.phone && (
+                            <a
+                                href={`tel:${item.phone.replace(/\s+/g, "")}`}
+                                className="flex items-center gap-2 text-black hover:text-primary dark:text-white"
+                            >
+                                <Phone className="h-4 w-4" /> {item.phone}
+                            </a>
+                        )}
                     </div>
 
                     <div className="rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
