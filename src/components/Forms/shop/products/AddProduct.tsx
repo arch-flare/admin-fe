@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import SearchableSelect from '@/components/common/SearchableSelect';
 import { useRouter } from "next/navigation";
 import { get, post } from "@/utils/api";
 import { ImagePlus, Loader2, X, Plus, Trash2 } from "lucide-react";
@@ -29,6 +30,25 @@ interface FormData {
     variations: Variation[];
 }
 
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/jpg'];
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024; // matches the server's 2MB limit
+
+/** Split picked files into acceptable ones and human-readable problems. */
+const checkImages = (files: File[]) => {
+    const ok: File[] = [];
+    const problems: string[] = [];
+    files.forEach(file => {
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            problems.push(`"${file.name}" is not a JPG or PNG image.`);
+        } else if (file.size > MAX_IMAGE_BYTES) {
+            problems.push(`"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)}MB; the limit is 2MB.`);
+        } else {
+            ok.push(file);
+        }
+    });
+    return { ok, problems };
+};
+
 const AddProduct = () => {
     const router = useRouter();
     const [formData, setFormData] = useState<FormData>({
@@ -47,6 +67,12 @@ const AddProduct = () => {
     const [error, setError] = useState<string | null>(null);
     const [imagePreview, setImagePreview] = useState<string[]>([]);
     const [variationPreviews, setVariationPreviews] = useState<string[][]>([]);
+    const errorRef = useRef<HTMLDivElement>(null);
+
+    // Bring the message into view so it is never missed on long/mobile forms
+    useEffect(() => {
+        if (error) errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, [error]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -74,7 +100,10 @@ const AddProduct = () => {
         } else if (type === 'file') {
             const fileInput = e.target as HTMLInputElement;
             if (fileInput.files) {
-                const filesArray = Array.from(fileInput.files);
+                const picked = checkImages(Array.from(fileInput.files));
+                const filesArray = picked.ok;
+                fileInput.value = ''; // allow picking the same file again
+                setError(picked.problems.length ? picked.problems.join('\n') : null);
 
                 // Check if this is a variation image
                 const variationMatch = name.match(/variations\[(\d+)\]\.images/);
@@ -82,9 +111,10 @@ const AddProduct = () => {
                     const variationIndex = parseInt(variationMatch[1]);
                     handleVariationImageChange(variationIndex, filesArray);
                 } else {
-                    setFormData(prev => ({ ...prev, images: filesArray }));
+                    // Add to the images already chosen instead of replacing them
+                    setFormData(prev => ({ ...prev, images: [...prev.images, ...filesArray] }));
                     const previews = filesArray.map(file => URL.createObjectURL(file));
-                    setImagePreview(previews);
+                    setImagePreview(prev => [...prev, ...previews]);
                 }
             }
         } else {
@@ -112,14 +142,14 @@ const AddProduct = () => {
         setFormData(prev => ({
             ...prev,
             variations: prev.variations.map((variation, i) =>
-                i === index ? { ...variation, images: files } : variation
+                i === index ? { ...variation, images: [...variation.images, ...files] } : variation
             )
         }));
 
         const previews = files.map(file => URL.createObjectURL(file));
         setVariationPreviews(prev => {
             const newPreviews = [...prev];
-            newPreviews[index] = previews;
+            newPreviews[index] = [...(newPreviews[index] || []), ...previews];
             return newPreviews;
         });
     };
@@ -179,8 +209,28 @@ const AddProduct = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         setError(null);
+
+        // Catch the common mistakes here, with a clear message, before uploading anything
+        const problems: string[] = [];
+        if (!formData.category_id) problems.push('Choose a category.');
+        if (formData.images.length === 0) problems.push('Add at least one product image.');
+        const skus = formData.variations.map(v => v.sku.trim().toLowerCase());
+        formData.variations.forEach((v, i) => {
+            if (v.images.length === 0) problems.push(`Variation #${i + 1}: add at least one image.`);
+            if (v.sku.trim() && v.sku.trim().toLowerCase() === formData.sku.trim().toLowerCase()) {
+                problems.push(`Variation #${i + 1}: SKU must differ from the main product SKU.`);
+            }
+            if (v.sku.trim() && skus.indexOf(v.sku.trim().toLowerCase()) !== i) {
+                problems.push(`Variation #${i + 1}: SKU is used by another variation.`);
+            }
+        });
+        if (problems.length) {
+            setError(problems.join('\n'));
+            return;
+        }
+
+        setLoading(true);
 
         try {
             const data = new FormData();
@@ -218,7 +268,14 @@ const AddProduct = () => {
                 setError(response.message || 'Failed to create product');
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Failed to create product');
+            const data = err.response?.data;
+            if (data?.errors) {
+                // Laravel validation errors: { "variations.0.sku": ["..."] } -> readable lines
+                const lines = Object.values(data.errors).flat() as string[];
+                setError(lines.join('\n') || data.message);
+            } else {
+                setError(data?.message || 'Failed to create product. Please try again.');
+            }
             console.error('Error creating product:', err);
         } finally {
             setLoading(false);
@@ -250,20 +307,15 @@ const AddProduct = () => {
                         <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                             Category <span className="text-meta-1">*</span>
                         </label>
-                        <select
+                        <SearchableSelect
                             name="category_id"
-                            value={formData.category_id}
-                            onChange={handleChange}
                             required
-                            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                        >
-                            <option value="">Select Category</option>
-                            {categories.map(category => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
+                            placeholder="Select Category"
+                            searchPlaceholder="Search categories..."
+                            value={formData.category_id}
+                            onChange={(v) => setFormData(prev => ({ ...prev, category_id: v }))}
+                            options={categories.map(c => ({ value: String(c.id), label: c.name }))}
+                        />
                     </div>
 
                     {/* Name Field */}
@@ -299,7 +351,7 @@ const AddProduct = () => {
                     </div>
 
                     {/* Base Product Details Row */}
-                    <div className="mb-4.5 grid grid-cols-3 gap-4">
+                    <div className="mb-4.5 grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <div>
                             <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                                 Price <span className="text-meta-1">*</span>
@@ -353,6 +405,9 @@ const AddProduct = () => {
                     <div className="mb-4.5">
                         <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                             Product Images <span className="text-meta-1">*</span>
+                            <span className="ml-2 font-normal text-body dark:text-bodydark">
+                                JPG or PNG, up to 2MB each. You can add more than once.
+                            </span>
                         </label>
                         <div className="flex flex-wrap gap-4">
                             {imagePreview.map((preview, index) => (
@@ -422,7 +477,7 @@ const AddProduct = () => {
 
                     {/* Variations Section */}
                     <div className="mb-4.5">
-                        <div className="flex justify-between items-center mb-3">
+                        <div className="flex flex-wrap justify-between items-center gap-3 mb-3">
                             <label className="block text-sm font-medium text-black dark:text-white">
                                 Product Variations
                             </label>
@@ -449,7 +504,7 @@ const AddProduct = () => {
                                     </button>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div className="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
                                     <div>
                                         <label className="mb-2.5 block text-black dark:text-white">
                                             Name <span className="text-meta-1">*</span>
@@ -478,7 +533,7 @@ const AddProduct = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div className="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
                                     <div>
                                         <label className="mb-2.5 block text-black dark:text-white">
                                             Price <span className="text-meta-1">*</span>
@@ -512,7 +567,7 @@ const AddProduct = () => {
 
                                 <div>
                                     <label className="mb-2.5 block text-black dark:text-white">
-                                        Images
+                                        Images <span className="text-meta-1">*</span>
                                     </label>
                                     <div className="flex flex-wrap gap-4">
                                         {variationPreviews[index]?.map((preview, imgIndex) => (
@@ -549,14 +604,14 @@ const AddProduct = () => {
                     </div>
 
                     {error && (
-                        <div className="mb-4.5">
-                            <div className="bg-danger bg-opacity-10 text-danger px-4 py-3 rounded">
+                        <div className="mb-4.5" ref={errorRef}>
+                            <div role="alert" className="whitespace-pre-line bg-danger bg-opacity-10 text-danger px-4 py-3 rounded">
                                 {error}
                             </div>
                         </div>
                     )}
 
-                    <div className="flex gap-3">
+                    <div className="flex flex-col gap-3 sm:flex-row">
                         <button
                             type="submit"
                             disabled={loading}
