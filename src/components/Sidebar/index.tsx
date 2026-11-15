@@ -42,7 +42,7 @@ const menuGroups = [
       },
       {
         icon: <CalendarClock size={18} />,
-        label: "Consultations",
+        label: "Consultations & Inquiries",
         route: "/consultations",
       },
       {
