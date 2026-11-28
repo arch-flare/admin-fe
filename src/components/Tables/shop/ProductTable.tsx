@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { get } from "@/utils/api";
-import { Eye, Pencil, Trash2, Plus } from "lucide-react";
+import { Eye, Pencil, Trash2, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface Product {
@@ -22,6 +22,8 @@ interface Product {
     created_at: string;
 }
 
+type ProductStatusFilter = "all" | "active" | "inactive";
+
 const ProductsTable = () => {
     const router = useRouter();
     const [products, setProducts] = useState<Product[]>([]);
@@ -30,27 +32,47 @@ const ProductsTable = () => {
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
     const [total, setTotal] = useState(0);
+    const [searchInput, setSearchInput] = useState("");
+    const [search, setSearch] = useState("");
+    const [status, setStatus] = useState<ProductStatusFilter>("all");
 
     useEffect(() => {
+        const timeout = window.setTimeout(() => {
+            setSearch(searchInput.trim());
+            setPage(1);
+        }, 300);
+
+        return () => window.clearTimeout(timeout);
+    }, [searchInput]);
+
+    useEffect(() => {
+        let cancelled = false;
+
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const response: any = await get(`/products?page=${page}`);
+                setError(null);
+                const response: any = await get("/admin/products", { page, search, status });
+                if (cancelled) return;
+
                 if (response.status) {
                     setProducts(response.products.data);
                     setLastPage(response.products.last_page);
                     setTotal(response.products.total);
                 }
             } catch (err) {
-                setError('Failed to fetch products');
+                if (!cancelled) setError('Failed to fetch products');
                 console.error('Error fetching products:', err);
             } finally {
-                setLoading(false);
+                if (!cancelled) setLoading(false);
             }
         };
 
         fetchProducts();
-    }, [page]);
+        return () => {
+            cancelled = true;
+        };
+    }, [page, search, status]);
 
     const handleDelete = async (id: number) => {
         if (window.confirm('Are you sure you want to delete this product?')) {
@@ -66,25 +88,9 @@ const ProductsTable = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="rounded-sm border border-stroke bg-white p-8 text-center shadow-default dark:border-strokedark dark:bg-boxdark">
-                Loading products...
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="rounded-sm border border-stroke bg-white p-8 text-center text-danger shadow-default dark:border-strokedark dark:bg-boxdark">
-                {error}
-            </div>
-        );
-    }
-
     return (
         <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-            <div className="flex justify-between mb-4">
+            <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                 <h4 className="text-xl font-semibold text-black dark:text-white">
                     Products
                 </h4>
@@ -95,6 +101,37 @@ const ProductsTable = () => {
                     <Plus size={16} />
                     Add Product
                 </button>
+            </div>
+
+            <div className="mb-5 flex flex-col gap-3 sm:flex-row">
+                <label className="relative block flex-1 sm:max-w-md">
+                    <span className="sr-only">Search products</span>
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-bodydark2" />
+                    <input
+                        type="search"
+                        value={searchInput}
+                        onChange={(event) => setSearchInput(event.target.value)}
+                        placeholder="Search by name, SKU, or category"
+                        className="w-full rounded border border-stroke bg-transparent py-2.5 pl-10 pr-4 text-sm text-black outline-none focus:border-primary dark:border-strokedark dark:text-white"
+                    />
+                </label>
+
+                <label className="flex items-center gap-2 text-sm text-black dark:text-white">
+                    <span>Status</span>
+                    <select
+                        value={status}
+                        onChange={(event) => {
+                            setStatus(event.target.value as ProductStatusFilter);
+                            setPage(1);
+                        }}
+                        className="min-w-[150px] rounded border border-stroke bg-transparent px-3 py-2.5 text-sm text-black outline-none focus:border-primary dark:border-strokedark dark:text-white dark:bg-boxdark"
+                        aria-label="Filter products by status"
+                    >
+                        <option value="all">All statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </label>
             </div>
 
             <div className="max-w-full overflow-x-auto">
@@ -122,7 +159,25 @@ const ProductsTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {products.map((product) => (
+                        {error ? (
+                            <tr>
+                                <td colSpan={6} className="border-b border-[#eee] px-4 py-8 text-center text-danger dark:border-strokedark">
+                                    {error}
+                                </td>
+                            </tr>
+                        ) : loading ? (
+                            <tr>
+                                <td colSpan={6} className="border-b border-[#eee] px-4 py-8 text-center text-bodydark2 dark:border-strokedark">
+                                    Loading products...
+                                </td>
+                            </tr>
+                        ) : products.length === 0 ? (
+                            <tr>
+                                <td colSpan={6} className="border-b border-[#eee] px-4 py-8 text-center text-bodydark2 dark:border-strokedark">
+                                    No products match your search and filters.
+                                </td>
+                            </tr>
+                        ) : products.map((product) => (
                             <tr key={product.id}>
                                 <td className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
                                     <div className="flex items-center gap-3">
@@ -204,14 +259,14 @@ const ProductsTable = () => {
                 <div className="flex gap-2">
                     <button
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        disabled={page <= 1}
+                        disabled={loading || page <= 1}
                         className="rounded-md border border-stroke px-4 py-2 text-sm disabled:opacity-50 dark:border-strokedark dark:text-white"
                     >
                         Previous
                     </button>
                     <button
                         onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
-                        disabled={page >= lastPage}
+                        disabled={loading || page >= lastPage}
                         className="rounded-md border border-stroke px-4 py-2 text-sm disabled:opacity-50 dark:border-strokedark dark:text-white"
                     >
                         Next
