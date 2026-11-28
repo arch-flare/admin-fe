@@ -65,7 +65,7 @@ const JournalTable = () => {
         setError(null);
 
         get<any>("/blog-posts", { search, status, page })
-            .then((response) => {
+            .then((response: any) => {
                 if (!current) return;
                 const result = response?.posts;
                 setPosts(Array.isArray(result?.data) ? result.data : []);

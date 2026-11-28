@@ -77,7 +77,7 @@ const JournalForm = ({ postId }: Props) => {
 
     useEffect(() => {
         get<any>("/blog-posts-services")
-            .then((response) => setServices(response?.services ?? []))
+            .then((response: any) => setServices(response?.services ?? []))
             .catch(() => setServices([]));
     }, []);
 
@@ -85,7 +85,7 @@ const JournalForm = ({ postId }: Props) => {
         if (!postId) return;
         let current = true;
         get<any>(`/blog-posts/${postId}`)
-            .then((response) => {
+            .then((response: any) => {
                 if (!current) return;
                 const post = response.post;
                 setForm({
