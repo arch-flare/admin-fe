@@ -85,7 +85,7 @@ export const JournalForm = ({ postId }: Props) => {
             data.append("body", form.body);
             data.append("service_slug", form.service_slug);
             data.append("is_published", form.is_published ? "1" : "0");
-            if (form.published_at) data.append("published_at", form.published_at);
+            data.append("published_at", form.published_at);
             if (newImage) data.append("image", newImage);
             if (removeImage && !newImage) data.append("remove_image", "1");
 
