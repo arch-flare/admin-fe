@@ -122,8 +122,8 @@ const JournalForm = ({ postId }: Props) => {
         return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https: data: blob:; style-src 'unsafe-inline' https:; font-src https:;">
-<link rel="stylesheet" href="${SITE_URL}/assets/css/journal.css?v=2">
-<style>html,body{margin:0;background:#f7f6f2}body{min-height:100vh}.af-journal{box-sizing:border-box;width:100%;max-width:1240px}.af-journal *{box-sizing:border-box}.af-article-header{padding-top:4px}.af-article-content p:first-child{margin-top:0}</style>
+<link rel="stylesheet" href="${SITE_URL}/assets/css/journal.css?v=3">
+<style>html,body{margin:0;background:#fff}body{min-height:100vh}.af-journal{box-sizing:border-box;width:100%;max-width:1240px}.af-journal *{box-sizing:border-box}.af-article-header{padding-top:4px}.af-article-content p:first-child{margin-top:0}</style>
 </head><body><main class="af-journal af-journal-article">
 <nav class="af-journal-breadcrumb"><a href="#">Journal</a><span>/</span><span>${title}</span></nav>
 <header class="af-article-header"><p class="af-journal-eyebrow">ARCHFLAIRE · JOURNAL</p><h1>${title}</h1><p class="af-article-deck">${description}</p><p class="af-journal-meta">${date} <span>·</span> PREVIEW</p></header>
@@ -251,7 +251,7 @@ ${image}<article class="af-article-body">${intro}<div class="af-article-content"
                                     )}
                                 </div>
                                 <iframe title="Live public journal preview" sandbox="" srcDoc={previewDocument}
-                                    className="h-[72vh] min-h-[640px] w-full rounded-md border border-stroke bg-[#f7f6f2] dark:border-strokedark" />
+                                    className="h-[72vh] min-h-[640px] w-full rounded-md border border-stroke bg-white dark:border-strokedark" />
                             </div>
                         ) : (
                             <div className="p-5 sm:p-6">
