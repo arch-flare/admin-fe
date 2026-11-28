@@ -30,6 +30,7 @@ interface JournalFormValues {
 }
 
 const SITE_URL = (process.env.NEXT_PUBLIC_API_URL || "https://archflaire.com/api/").replace(/\/api\/?$/, "");
+const FALLBACK_COVER = `${SITE_URL}/assets/img/home/featured/villa-living-sage.jpg`;
 const inputClass = "w-full rounded-md border border-stroke bg-white px-4 py-3 text-sm text-black outline-none transition placeholder:text-body focus:border-primary focus:ring-2 focus:ring-primary/10 dark:border-strokedark dark:bg-boxdark dark:text-white";
 const labelClass = "mb-2 block text-sm font-medium text-black dark:text-white";
 
@@ -112,7 +113,7 @@ const JournalForm = ({ postId }: Props) => {
         const title = escapeHtml(form.title || "Your article title");
         const description = escapeHtml(form.description || "A short introduction will appear here on the public journal.");
         const intro = form.intro ? `<p class="af-article-intro">${escapeHtml(form.intro)}</p>` : "";
-        const image = coverImage ? `<figure class="af-article-cover"><img src="${escapeHtml(coverImage)}" alt="${title}"></figure>` : "";
+        const image = `<figure class="af-article-cover"><img src="${escapeHtml(coverImage || FALLBACK_COVER)}" alt="${title}"></figure>`;
         const body = form.body || '<p>Your article will appear here as you write.</p>';
         const date = form.published_at
             ? new Intl.DateTimeFormat(undefined, { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${form.published_at}T12:00:00`))
@@ -121,7 +122,7 @@ const JournalForm = ({ postId }: Props) => {
         return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https: data: blob:; style-src 'unsafe-inline' https:; font-src https:;">
-<link rel="stylesheet" href="${SITE_URL}/assets/css/journal.css?v=1">
+<link rel="stylesheet" href="${SITE_URL}/assets/css/journal.css?v=2">
 <style>html,body{margin:0;background:#f7f6f2}body{min-height:100vh}.af-journal{box-sizing:border-box;width:100%;max-width:1240px}.af-journal *{box-sizing:border-box}.af-article-header{padding-top:4px}.af-article-content p:first-child{margin-top:0}</style>
 </head><body><main class="af-journal af-journal-article">
 <nav class="af-journal-breadcrumb"><a href="#">Journal</a><span>/</span><span>${title}</span></nav>
